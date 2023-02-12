@@ -59,7 +59,7 @@ public partial class MitochondriaPlugin : BasePlugin
         
         Harmony.PatchAll();
         
-        ShowTooltipsOption = new CustomToggleOption<MitochondriaPlugin>("Show Tooltips", true);
+        ShowTooltipsOption = new CustomToggleOption<MitochondriaPlugin>("Show Tooltips", true, false);
     }
 
     public override bool Unload()

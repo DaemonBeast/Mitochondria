@@ -1,9 +1,11 @@
 ﻿using HarmonyLib;
+using Il2CppInterop.Runtime;
 using Mitochondria.Framework.Cache;
 using Mitochondria.Framework.Options.SettingsOptions;
 using Mitochondria.Framework.Options.SettingsOptions.Providers;
 using Mitochondria.Framework.UI.Extensions;
 using Mitochondria.Framework.UI.Flex.SettingsOptions;
+using Mitochondria.Framework.Utilities.Extensions;
 using Reactor.Utilities.Extensions;
 using Object = UnityEngine.Object;
 
@@ -19,7 +21,7 @@ internal static class SettingsOptionPatches
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
     public static class FlexPatch
     {
-        public static void Postfix(GameOptionsMenu __instance)
+        public static void Prefix(GameOptionsMenu __instance)
         {
             PreGameOptionsMenuOpened?.Invoke(__instance);
             
@@ -68,8 +70,72 @@ internal static class SettingsOptionPatches
                 .Where(f => f != null);
 
             SettingsOptionManager.Instance.FlexContainer.TryAddRange(flex);
+        }
 
+        public static void Postfix(GameOptionsMenu __instance)
+        {
             PostGameOptionsMenuOpened?.Invoke(__instance);
+        }
+    }
+    
+    [HarmonyPatch(typeof(OptionsConsole), nameof(OptionsConsole.CanUse))]
+    public static class NonHostGameOptionsMenuShowPatch
+    {
+        public static void Prefix(OptionsConsole __instance)
+        {
+            __instance.HostOnly = false;
+        }
+    }
+
+    [HarmonyPatch(typeof(OptionBehaviour), nameof(OptionBehaviour.SetAsPlayer))]
+    public static class NonHostGameOptionsMenuOptionsPatch
+    {
+        public static bool Prefix(OptionBehaviour __instance)
+        {
+            var isRoleOptionSetting = __instance.TryCast<RoleOptionSetting>() != null;
+            
+            var buttonGameObjects = __instance.gameObject
+                .GetChildren()
+                .SelectMany(g => g.GetComponentsInChildren<PassiveButton>())
+                .Select(p => p.gameObject)
+                .Where(g => g.name != "More Options");
+
+            foreach (var buttonGameObject in buttonGameObjects)
+            {
+                buttonGameObject.SetActive(false);
+            }
+
+            if ((!SettingsOptionManager.Instance.TryGetSettingsOption(__instance.gameObject, out var settingsOption) ||
+                 settingsOption.BoxedCustomOption.HostOnly) &&
+                !isRoleOptionSetting &&
+                __instance.TryGetComponent(Il2CppType.Of<PassiveButton>(), out var b))
+            {
+                var button = b.Cast<PassiveButton>();
+
+                button.enabled = false;
+            }
+            
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.Update))]
+    public static class NonHostRoleOptionsMenuRefreshPatch
+    {
+        public static void Postfix(RolesSettingsMenu __instance)
+        {
+            var roleOptions = GameOptionsManager.Instance.CurrentGameOptions.RoleOptions;
+            
+            foreach (var optionBehaviour in __instance.Children)
+            {
+                var roleOptionSetting = optionBehaviour.TryCast<RoleOptionSetting>();
+                if (roleOptionSetting == null)
+                {
+                    continue;
+                }
+                
+                roleOptionSetting.UpdateValuesAndText(roleOptions);
+            }
         }
     }
 }

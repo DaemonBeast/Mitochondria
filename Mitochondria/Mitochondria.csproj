@@ -9,7 +9,7 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         
-        <VersionPrefix>0.1.0</VersionPrefix>
+        <VersionPrefix>0.2.0</VersionPrefix>
         <VersionSuffix>dev</VersionSuffix>
         <Description>API for Among Us mods</Description>
         <Authors>Daemon</Authors>

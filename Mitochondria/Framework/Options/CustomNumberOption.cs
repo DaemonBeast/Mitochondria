@@ -22,7 +22,8 @@ public class CustomNumberOption<TPlugin> : CustomOption<TPlugin, float>, ICustom
         FloatRange range,
         float step = 1f,
         string? formatString = null,
-        bool zeroIsInfinity = false) : base(title, value, formatString)
+        bool zeroIsInfinity = false,
+        bool sync = true) : base(title, value, formatString, sync)
     {
         Range = range;
         Step = step;

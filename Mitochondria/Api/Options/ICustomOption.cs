@@ -1,4 +1,5 @@
-﻿using Mitochondria.Api.Owner;
+﻿using Mitochondria.Api.Networking;
+using Mitochondria.Api.Owner;
 
 namespace Mitochondria.Api.Options;
 
@@ -14,7 +15,7 @@ public interface ICustomOption<TValue> : ICustomOption
     public event ValueChangedHandler? OnValueChanged;
 }
 
-public interface ICustomOption : IOwned
+public interface ICustomOption : IOwned, ISyncable
 {
     public StringNames TitleName { get; }
     
@@ -25,6 +26,8 @@ public interface ICustomOption : IOwned
     public Type ValueType { get; }
     
     public string FormatString { get; }
+    
+    public bool Sync { get; }
 
     public delegate void ChangedHandler(ICustomOption customOption);
 

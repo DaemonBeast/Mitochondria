@@ -4,7 +4,9 @@ using AmongUs.GameOptions;
 using Il2CppInterop.Generator.Extensions;
 using Mitochondria.Api.Options;
 using Mitochondria.Api.Options.SettingsOptions;
+using Mitochondria.Framework.Networking;
 using Mitochondria.Framework.Utilities;
+using Reactor.Utilities;
 
 namespace Mitochondria.Framework.Options.SettingsOptions;
 
@@ -17,15 +19,18 @@ public class CustomSettingsOptionManager
 
     public ImmutableArray<ICustomSettingsOptionConverter> Converters => _converters.ToImmutableArray();
 
-    public delegate void CustomOptionAddedHandler(ICustomSettingsOption customSettingsOption);
+    public delegate void CustomSettingsOptionAddedHandler(ICustomSettingsOption customSettingsOption);
 
-    public delegate void CustomOptionRemovedHandler(ICustomSettingsOption customSettingsOption);
+    public delegate void CustomSettingsOptionRemovedHandler(ICustomSettingsOption customSettingsOption);
 
-    public delegate void CustomOptionChangedHandler(ICustomSettingsOption customSettingsOption);
+    public delegate void CustomSettingsOptionChangedHandler(ICustomSettingsOption customSettingsOption);
+
+    public delegate void CustomOptionChangedHandler(ICustomOption customOption);
 
     public event Action? OnCustomOptionCollectionChanged;
-    public event CustomOptionAddedHandler? OnCustomOptionAdded;
-    public event CustomOptionRemovedHandler? OnCustomOptionRemoved;
+    public event CustomSettingsOptionAddedHandler? OnCustomSettingsOptionAdded;
+    public event CustomSettingsOptionRemovedHandler? OnCustomSettingsOptionRemoved;
+    public event CustomSettingsOptionChangedHandler? OnCustomSettingsOptionChanged;
     public event CustomOptionChangedHandler? OnCustomOptionChanged;
 
     private readonly Dictionary<GameModes, List<ICustomSettingsOption>> _customSettingsOptions;
@@ -36,44 +41,62 @@ public class CustomSettingsOptionManager
         _customSettingsOptions = new Dictionary<GameModes, List<ICustomSettingsOption>>();
         _converters = new List<ICustomSettingsOptionConverter>();
 
-        OnCustomOptionAdded += _ => OnCustomOptionCollectionChanged?.Invoke();
-        OnCustomOptionRemoved += _ => OnCustomOptionCollectionChanged?.Invoke();
+        OnCustomSettingsOptionAdded += _ => OnCustomOptionCollectionChanged?.Invoke();
+        OnCustomSettingsOptionRemoved += _ => OnCustomOptionCollectionChanged?.Invoke();
     }
 
     public void Add(ICustomSettingsOption customSettingsOption)
     {
-        _customSettingsOptions
-            .GetOrCreate(customSettingsOption.GameMode, _ => new List<ICustomSettingsOption>())
-            .Add(customSettingsOption);
-
         var customOption = customSettingsOption.BoxedCustomOption;
+        
+        var customSettingsOptions = _customSettingsOptions
+            .GetOrCreate(customSettingsOption.GameMode, _ => new List<ICustomSettingsOption>());
 
-        customOption.OnChanged += CustomOptionChanged;
+        if (customSettingsOptions.Any(c => c.BoxedCustomOption == customOption))
+        {
+            Logger<MitochondriaPlugin>.Warning("Custom settings option added for same gamemode multiple times");
 
-        OnCustomOptionAdded?.Invoke(customSettingsOption);
+            return;
+        }
+
+        if (!Find(customOption).Any())
+        {
+            customOption.OnChanged += CustomOptionChanged;
+        }
+        
+        customSettingsOptions.Add(customSettingsOption);
+
+        OnCustomSettingsOptionAdded?.Invoke(customSettingsOption);
     }
 
     public void Remove(ICustomSettingsOption customSettingsOption)
     {
-        _customSettingsOptions.GetValueOrDefault(customSettingsOption.GameMode)?.Remove(customSettingsOption);
+        var customSettingsOptions = _customSettingsOptions.GetValueOrDefault(customSettingsOption.GameMode);
+        if (customSettingsOptions == null || !customSettingsOptions.Remove(customSettingsOption))
+        {
+            // uhhhhhh, I mean, I'm not complaining, but this shouldn't happen
+            return;
+        }
 
-        customSettingsOption.BoxedCustomOption.OnChanged -= CustomOptionChanged;
+        var customOption = customSettingsOption.BoxedCustomOption;
 
-        OnCustomOptionRemoved?.Invoke(customSettingsOption);
+        if (!Find(customOption).Any())
+        {
+            customOption.OnChanged -= CustomOptionChanged;
+        }
+
+        OnCustomSettingsOptionRemoved?.Invoke(customSettingsOption);
     }
 
-    public bool TryGet(ICustomOption customOption, [NotNullWhen(true)] out ICustomSettingsOption? customSettingsOption)
+    public IEnumerable<ICustomSettingsOption> Find(ICustomOption customOption)
     {
         foreach (var gameMode in Enum.GetValues<GameModes>())
         {
-            if (TryGet(gameMode, customOption, out customSettingsOption))
+            if (TryGet(gameMode, customOption, out var customSettingsOption))
             {
-                return true;
+                yield return customSettingsOption;
             }
         }
-
-        customSettingsOption = null;
-        return false;
     }
 
     public bool TryGet(
@@ -156,8 +179,17 @@ public class CustomSettingsOptionManager
     }
 
     private void CustomOptionChanged(ICustomOption customOption)
-        => OnCustomOptionChanged?.Invoke(
-            TryGet(customOption, out var customSettingsOption)
-                ? customSettingsOption
-                : throw new Exception("This shouldn't ever happen. REEEEEEEEEEEEEEEE"));
+    {
+        if (customOption.Sync)
+        {
+            SyncableManager.Instance.Sync(customOption);
+        }
+
+        OnCustomOptionChanged?.Invoke(customOption);
+
+        foreach (var customSettingsOption in Find(customOption))
+        {
+            OnCustomSettingsOptionChanged?.Invoke(customSettingsOption);
+        }
+    }
 }

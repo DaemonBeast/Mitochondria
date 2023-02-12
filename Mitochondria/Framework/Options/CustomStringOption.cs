@@ -24,7 +24,8 @@ public class CustomStringOption<TPlugin, TEnum> : CustomOption<TPlugin, TEnum>, 
         string title,
         TEnum value,
         IDictionary<TEnum, string>? displayValues = null,
-        string? formatString = null) : base(title, value, formatString)
+        string? formatString = null,
+        bool sync = true) : base(title, value, formatString, sync)
     {
         ValueNames = Enum.GetValues<TEnum>()
             .Select(e => CustomStringName.CreateAndRegister(

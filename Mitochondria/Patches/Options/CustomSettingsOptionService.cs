@@ -24,9 +24,9 @@ public class CustomSettingsOptionService : IService
     {
         AddOptionsWithAttribute();
 
-        CustomSettingsOptionManager.Instance.OnCustomOptionAdded += CustomOptionAdded;
-        CustomSettingsOptionManager.Instance.OnCustomOptionRemoved += CustomOptionRemoved;
-        CustomSettingsOptionManager.Instance.OnCustomOptionChanged += CustomOptionChanged;
+        CustomSettingsOptionManager.Instance.OnCustomSettingsOptionAdded += CustomSettingsOptionAdded;
+        CustomSettingsOptionManager.Instance.OnCustomSettingsOptionRemoved += CustomSettingsOptionRemoved;
+        CustomSettingsOptionManager.Instance.OnCustomSettingsOptionChanged += CustomSettingsOptionChanged;
 
         SettingsOptionPatches.PostGameOptionsMenuOpened +=
             _ => TryCreateSettingsOptions(GameOptionsManager.Instance.currentGameMode);
@@ -114,7 +114,7 @@ public class CustomSettingsOptionService : IService
         }
     }
 
-    private void CustomOptionAdded(ICustomSettingsOption customSettingsOption)
+    private void CustomSettingsOptionAdded(ICustomSettingsOption customSettingsOption)
     {
         if (GameOptionsManager.Instance.currentGameMode == customSettingsOption.GameMode)
         {
@@ -122,7 +122,7 @@ public class CustomSettingsOptionService : IService
         }
     }
     
-    private void CustomOptionRemoved(ICustomSettingsOption customSettingsOption)
+    private void CustomSettingsOptionRemoved(ICustomSettingsOption customSettingsOption)
     {
         var settingsOptions = SettingsOptionManager.Instance.SettingsOptions;
         
@@ -141,7 +141,7 @@ public class CustomSettingsOptionService : IService
         settingsOptions.Remove(customSettingsOption);
     }
 
-    private void CustomOptionChanged(ICustomSettingsOption customSettingsOption)
+    private void CustomSettingsOptionChanged(ICustomSettingsOption customSettingsOption)
     {
         if (GameOptionsManager.Instance.currentGameMode != customSettingsOption.GameMode ||
             !SettingsOptionManager.Instance.SettingsOptions.TryGetValue(customSettingsOption, out var gameObject) ||

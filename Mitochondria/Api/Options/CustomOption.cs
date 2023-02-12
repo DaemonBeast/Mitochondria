@@ -1,6 +1,10 @@
 ﻿using BepInEx.Unity.IL2CPP;
+using Hazel;
+using Mitochondria.Framework.Networking;
 using Mitochondria.Framework.Utilities.Extensions;
 using Reactor.Localization.Utilities;
+using Reactor.Networking.Serialization;
+using Reactor.Utilities;
 
 namespace Mitochondria.Api.Options;
 
@@ -18,6 +22,8 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
 
     public string FormatString { get; }
 
+    public bool Sync { get; }
+
     public TValue Value
     {
         get => _value;
@@ -25,6 +31,10 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
     }
     
     public TValue DefaultValue { get; }
+    
+    public string Id { get; }
+
+    public bool HostOnly { get; }
 
     public event ICustomOption<TValue>.ValueChangedHandler? OnValueChanged;
 
@@ -37,17 +47,26 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
     public CustomOption(
         string title,
         TValue value,
-        string? formatString = null)
+        string? formatString = null,
+        bool sync = true)
     {
         Title = title;
         ValueType = typeof(TValue);
         _value = value;
         DefaultValue = value;
         FormatString = formatString ?? DefaultFormatString;
+        Sync = sync;
+        HostOnly = sync;
 
         TitleName = CustomStringName.CreateAndRegister(Title);
+        Id = $"CustomOption_{Title}";
 
         this.SetOwner<TPlugin>();
+
+        if (sync)
+        {
+            SyncableManager.Instance.Add(this);
+        }
     }
 
     public void ResetValue()
@@ -57,6 +76,21 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
 
     public bool HasDefaultValue()
         => EqualityComparer<TValue>.Default.Equals(Value, DefaultValue);
+    
+    public void Serialize(MessageWriter writer)
+    {
+        writer.Serialize(Value);
+    }
+
+    public void Deserialize(MessageReader reader)
+    {
+        Value = (TValue) reader.Deserialize(ValueType);
+    }
+
+    public override string ToString()
+    {
+        return $"{Title}: {ValueString}";
+    }
 
     private void SetAndInvokeEvent(TValue newValue)
     {
@@ -67,6 +101,8 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
 
         var oldValue = _value;
         _value = newValue;
+        
+        Logger<MitochondriaPlugin>.Warning($"changed from {oldValue} to {newValue}");
 
         OnValueChanged?.Invoke(this, oldValue, newValue);
         OnChanged?.Invoke(this);
