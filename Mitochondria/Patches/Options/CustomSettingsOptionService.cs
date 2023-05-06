@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace Mitochondria.Patches.Options;
 
-[Service]
+[RegisterService]
 public class CustomSettingsOptionService : IService
 {
     void IService.OnStart()
@@ -41,7 +41,7 @@ public class CustomSettingsOptionService : IService
             .ToArray();
         
         var props = types
-            .SelectMany(t => t.GetProperties())
+            .SelectMany(t => t.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
             .Where(p => p.GetCustomAttributes<CustomSettingsOptionAttribute>().Any());
 
         foreach (var prop in props)
@@ -60,7 +60,7 @@ public class CustomSettingsOptionService : IService
         }
 
         var fields = types
-            .SelectMany(t => t.GetFields())
+            .SelectMany(t => t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
             .Where(f => f.GetCustomAttributes<CustomSettingsOptionAttribute>().Any());
 
         foreach (var field in fields)
@@ -95,20 +95,26 @@ public class CustomSettingsOptionService : IService
                     attribute.Order)!;
 
                 CustomSettingsOptionManager.Instance.Add(customSettingsOption);
-                    
+                
                 break;
             }
             case ICustomSettingsOption customSettingsOption:
             {
                 CustomSettingsOptionManager.Instance.Add(customSettingsOption);
-                    
+                
+                break;
+            }
+            case null:
+            {
+                Logger<MitochondriaPlugin>.Warning($"Property with {nameof(CustomSettingsOptionAttribute)} was null");
+
                 break;
             }
             default:
             {
                 Logger<MitochondriaPlugin>.Warning(
                     $"Property with {nameof(CustomSettingsOptionAttribute)} must be a custom option");
-                    
+                
                 break;
             }
         }

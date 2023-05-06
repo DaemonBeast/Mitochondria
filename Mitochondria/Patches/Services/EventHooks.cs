@@ -41,4 +41,13 @@ public class EventHooks : MonoBehaviour
             ServiceManager.Instance.TryInvokeMethod(nameof(IService.OnLobbyJoined));
         }
     }
+
+    [HarmonyPatch(typeof(HudManager), nameof(HudManager.Start))]
+    public static class HudManagerStartPatch
+    {
+        public static void Postfix(HudManager __instance)
+        {
+            ServiceManager.Instance.TryInvokeMethod(nameof(IService.OnHudStart), __instance);
+        }
+    }
 }

@@ -4,7 +4,6 @@ using Mitochondria.Framework.Networking;
 using Mitochondria.Framework.Utilities.Extensions;
 using Reactor.Localization.Utilities;
 using Reactor.Networking.Serialization;
-using Reactor.Utilities;
 
 namespace Mitochondria.Api.Options;
 
@@ -44,7 +43,7 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
 
     private const string DefaultFormatString = "{0}";
 
-    public CustomOption(
+    protected CustomOption(
         string title,
         TValue value,
         string? formatString = null,
@@ -101,8 +100,6 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
 
         var oldValue = _value;
         _value = newValue;
-        
-        Logger<MitochondriaPlugin>.Warning($"changed from {oldValue} to {newValue}");
 
         OnValueChanged?.Invoke(this, oldValue, newValue);
         OnChanged?.Invoke(this);

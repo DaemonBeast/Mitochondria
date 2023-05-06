@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Mitochondria.Patches.Options;
 
-[Service]
+[RegisterService]
 public class SettingsOptionService : IService
 {
     private int _orderCounter;

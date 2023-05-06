@@ -26,10 +26,6 @@ public class SettingsOptionManager
     private readonly List<ISettingsOptionFactory> _factories;
     private readonly List<ISettingsOptionHandlerProvider> _handlerProviders;
 
-    private delegate (bool, GameObject?) ProviderTryGetNewOptionHandler(ISettingsOptionProvider settingsOptionProvider);
-
-    private delegate (bool, GameObject?) FactoryTryCreateOptionHandler(ISettingsOptionFactory settingsOptionFactory);
-
     private SettingsOptionManager()
     {
         SettingsOptions = new Dictionary<ICustomSettingsOption, GameObject>();

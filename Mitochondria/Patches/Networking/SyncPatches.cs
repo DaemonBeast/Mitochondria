@@ -3,7 +3,7 @@ using Mitochondria.Framework.Networking;
 
 namespace Mitochondria.Patches.Networking;
 
-public static class SyncPatches
+internal static class SyncPatches
 {
     [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerJoined))]
     public static class SyncOnJoin

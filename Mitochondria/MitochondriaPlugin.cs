@@ -9,6 +9,7 @@ using Mitochondria.Framework.Options.SettingsOptions.Factories;
 using Mitochondria.Framework.Options.SettingsOptions.Providers;
 using Mitochondria.Framework.Options.SettingsOptions.Providers.Handler;
 using Mitochondria.Framework.Plugin;
+using Mitochondria.Framework.Roles;
 using Mitochondria.Framework.Services;
 using Mitochondria.Framework.Services.Extensions;
 using Mitochondria.Framework.Utilities.Extensions;
@@ -37,7 +38,10 @@ public partial class MitochondriaPlugin : BasePlugin
         {
             PluginManager.Instance.Add(basePlugin.GetType(), pluginInfo);
             
-            ServiceAttribute.Register(assembly, pluginInfo);
+            RegisterServiceAttribute.Register(assembly, pluginInfo);
+            
+            RegisterCustomRoleAttribute.Register(assembly);
+            
             CustomSettingsOptionConverterAttribute.Register(assembly);
             SettingsOptionProviderAttribute.Register(assembly);
             SettingsOptionFactoryAttribute.Register(assembly);

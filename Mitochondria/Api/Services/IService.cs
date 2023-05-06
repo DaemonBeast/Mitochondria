@@ -29,4 +29,8 @@ public interface IService : IOwned
     protected internal void OnLobbyJoined()
     {
     }
+
+    protected internal void OnHudStart(HudManager hudManager)
+    {
+    }
 }

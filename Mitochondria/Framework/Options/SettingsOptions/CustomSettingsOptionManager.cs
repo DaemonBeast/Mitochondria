@@ -45,6 +45,14 @@ public class CustomSettingsOptionManager
         OnCustomSettingsOptionRemoved += _ => OnCustomOptionCollectionChanged?.Invoke();
     }
 
+    public void AddRange(IEnumerable<ICustomSettingsOption> customSettingsOptions)
+    {
+        foreach (var customSettingsOption in customSettingsOptions)
+        {
+            Add(customSettingsOption);
+        }
+    }
+
     public void Add(ICustomSettingsOption customSettingsOption)
     {
         var customOption = customSettingsOption.BoxedCustomOption;
