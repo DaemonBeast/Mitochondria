@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using Mitochondria.Api.Services;
 using Mitochondria.Api.UI.Flex;
+using Mitochondria.Framework.Helpers;
 using Mitochondria.Framework.Services;
 using Mitochondria.Framework.UI.Flex;
 using Mitochondria.Framework.UI.Flex.SettingsOptions;
@@ -8,7 +9,7 @@ using UnityEngine;
 
 namespace Mitochondria.Patches.Options;
 
-[RegisterService]
+[Service]
 public class SettingsOptionService : IService
 {
     private int _orderCounter;
@@ -30,7 +31,7 @@ public class SettingsOptionService : IService
             Constants.Scenes.InGame,
             "HideNSeekOptionsMenu");
 
-        SettingsOptionPatches.PreGameOptionsMenuOpened += _ => _orderCounter = 0;
+        GameOptionsMenuHelper.OnBeforeOpened += () => _orderCounter = 0;
     }
 
     private IFlex CreateSettingsOptionFlex(GameObject gameObject)

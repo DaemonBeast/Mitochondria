@@ -16,8 +16,7 @@ internal static class CustomSettingsOptionPatches
             if (gameOptions == null ||
                 !gameOptions.TryGetBool(BoolOptionNames.IsDefaults, out var isDefaults) ||
                 !isDefaults ||
-                !CustomSettingsOptionManager.Instance.CustomSettingsOptions
-                    .TryGetValue(gameMode, out var customSettingsOptions))
+                !CustomSettingsOptionManager.Instance.TryGet(gameMode, out var customSettingsOptions))
             {
                 return;
             }

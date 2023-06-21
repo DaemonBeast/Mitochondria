@@ -5,11 +5,11 @@ using Mitochondria.Framework.Utilities;
 namespace Mitochondria.Framework.Roles;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class RegisterCustomRoleAttribute : Attribute
+public class CustomRoleAttribute : Attribute
 {
     public static void Register(Assembly assembly)
     {
-        TypeUtilities.RegisterAttribute<RegisterCustomRoleAttribute, ICustomRole>(
+        TypeUtils.RegisterAttribute<CustomRoleAttribute, ICustomRole>(
             assembly,
             type => CustomRoleManager.Instance.Register(type));
     }

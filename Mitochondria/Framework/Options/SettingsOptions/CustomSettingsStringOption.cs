@@ -15,9 +15,3 @@ public class CustomSettingsStringOption<TPlugin, TEnum> : CustomSettingsOption<T
     {
     }
 }
-
-public readonly record struct StringOptionArgs(
-    StringNames Title,
-    int Value,
-    IEnumerable<StringNames> Values,
-    Action<StringOption>? ValueChangedHandler = null);

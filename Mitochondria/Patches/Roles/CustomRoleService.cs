@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Mitochondria.Patches.Roles;
 
-[RegisterService]
+[Service]
 public class CustomRoleService : IService
 {
     public ImmutableDictionary<ICustomRole, GameObject> RoleObjects => _roleObjects.ToImmutableDictionary();

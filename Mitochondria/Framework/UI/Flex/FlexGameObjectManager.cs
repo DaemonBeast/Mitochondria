@@ -96,7 +96,7 @@ public class FlexGameObjectManager
     {
         return _flexibleObjects
             .FirstOrDefault(e => Il2CppEqualityComparer<GameObject>.Instance.Equals(e.Key, gameObject))
-            .AsNullable()
+            .DefaultToNull()
             ?.Value;
     }
 }

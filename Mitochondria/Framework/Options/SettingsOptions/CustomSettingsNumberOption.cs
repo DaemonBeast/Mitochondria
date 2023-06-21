@@ -14,11 +14,3 @@ public class CustomSettingsNumberOption<TPlugin> : CustomSettingsOption<TPlugin,
     {
     }
 }
-
-public readonly record struct NumberOptionArgs(
-    StringNames Title,
-    float Value,
-    FloatRange Range,
-    Action<NumberOption>? ValueChangedHandler = null,
-    float Step = 1f,
-    bool ZeroIsInfinity = false);

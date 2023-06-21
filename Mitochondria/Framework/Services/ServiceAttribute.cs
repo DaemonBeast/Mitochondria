@@ -6,11 +6,11 @@ using Mitochondria.Framework.Utilities;
 namespace Mitochondria.Framework.Services;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class RegisterServiceAttribute : Attribute
+public class ServiceAttribute : Attribute
 {
     public static void Register(Assembly assembly, PluginInfo pluginInfo)
     {
-        TypeUtilities.RegisterAttribute<RegisterServiceAttribute, IService>(
+        TypeUtils.RegisterAttribute<ServiceAttribute, IService>(
             assembly,
             type => ServiceManager.Instance.Register(type, pluginInfo));
     }

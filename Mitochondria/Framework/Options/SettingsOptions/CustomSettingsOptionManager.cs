@@ -1,12 +1,15 @@
-﻿using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using AmongUs.GameOptions;
-using Il2CppInterop.Generator.Extensions;
 using Mitochondria.Api.Options;
 using Mitochondria.Api.Options.SettingsOptions;
-using Mitochondria.Framework.Networking;
+using Mitochondria.Framework.Helpers;
+using Mitochondria.Framework.UI.Extensions;
+using Mitochondria.Framework.UI.Flex.SettingsOptions;
 using Mitochondria.Framework.Utilities;
+using Mitochondria.Framework.Utilities.Extensions;
 using Reactor.Utilities;
+using Reactor.Utilities.Extensions;
+using UnityEngine;
 
 namespace Mitochondria.Framework.Options.SettingsOptions;
 
@@ -14,35 +17,24 @@ public class CustomSettingsOptionManager
 {
     public static CustomSettingsOptionManager Instance => Singleton<CustomSettingsOptionManager>.Instance;
 
-    public ImmutableDictionary<GameModes, ImmutableArray<ICustomSettingsOption>> CustomSettingsOptions =>
-        _customSettingsOptions.ToImmutableDictionary(e => e.Key, e => e.Value.ToImmutableArray());
-
-    public ImmutableArray<ICustomSettingsOptionConverter> Converters => _converters.ToImmutableArray();
-
-    public delegate void CustomSettingsOptionAddedHandler(ICustomSettingsOption customSettingsOption);
-
-    public delegate void CustomSettingsOptionRemovedHandler(ICustomSettingsOption customSettingsOption);
-
-    public delegate void CustomSettingsOptionChangedHandler(ICustomSettingsOption customSettingsOption);
-
-    public delegate void CustomOptionChangedHandler(ICustomOption customOption);
-
-    public event Action? OnCustomOptionCollectionChanged;
-    public event CustomSettingsOptionAddedHandler? OnCustomSettingsOptionAdded;
-    public event CustomSettingsOptionRemovedHandler? OnCustomSettingsOptionRemoved;
-    public event CustomSettingsOptionChangedHandler? OnCustomSettingsOptionChanged;
-    public event CustomOptionChangedHandler? OnCustomOptionChanged;
+    public IEnumerable<ICustomSettingsOption> CustomSettingsOptions => _customSettingsOptions.SelectMany(e => e.Value);
 
     private readonly Dictionary<GameModes, List<ICustomSettingsOption>> _customSettingsOptions;
-    private readonly List<ICustomSettingsOptionConverter> _converters;
+
+    private readonly Dictionary<ICustomSettingsOption, GameObject> _settingsOptions;
 
     private CustomSettingsOptionManager()
     {
         _customSettingsOptions = new Dictionary<GameModes, List<ICustomSettingsOption>>();
-        _converters = new List<ICustomSettingsOptionConverter>();
-
-        OnCustomSettingsOptionAdded += _ => OnCustomOptionCollectionChanged?.Invoke();
-        OnCustomSettingsOptionRemoved += _ => OnCustomOptionCollectionChanged?.Invoke();
+        _settingsOptions = new Dictionary<ICustomSettingsOption, GameObject>();
+        
+        GameOptionsMenuHelper.OnAfterOpened += () =>
+        {
+            if (GameOptionsManager.Instance != null)
+            {
+                TryCreateSettingsOptions(GameOptionsManager.Instance.currentGameMode);
+            }
+        };
     }
 
     public void AddRange(IEnumerable<ICustomSettingsOption> customSettingsOptions)
@@ -57,24 +49,27 @@ public class CustomSettingsOptionManager
     {
         var customOption = customSettingsOption.BoxedCustomOption;
         
-        var customSettingsOptions = _customSettingsOptions
-            .GetOrCreate(customSettingsOption.GameMode, _ => new List<ICustomSettingsOption>());
-
-        if (customSettingsOptions.Any(c => c.BoxedCustomOption == customOption))
+        if (_customSettingsOptions.TryGetValue(customSettingsOption.GameMode, out var customSettingsOptions))
         {
-            Logger<MitochondriaPlugin>.Warning("Custom settings option added for same gamemode multiple times");
-
-            return;
+            if (customSettingsOptions.Any(c => c.BoxedCustomOption == customOption))
+            {
+                Logger<MitochondriaPlugin>.Warning("Added custom settings option for same gamemode multiple times");
+            }
         }
-
-        if (!Find(customOption).Any())
+        else
         {
-            customOption.OnChanged += CustomOptionChanged;
+            customSettingsOptions = new List<ICustomSettingsOption>() { customSettingsOption };
+            _customSettingsOptions.Add(customSettingsOption.GameMode, customSettingsOptions);
         }
         
-        customSettingsOptions.Add(customSettingsOption);
+        customSettingsOption.OnChanged += CustomSettingsOptionChanged;
 
-        OnCustomSettingsOptionAdded?.Invoke(customSettingsOption);
+        customSettingsOptions.Add(customSettingsOption);
+        
+        if (GameOptionsManager.Instance?.currentGameMode == customSettingsOption.GameMode)
+        {
+            TryCreateSettingsOptions(customSettingsOption.GameMode);
+        }
     }
 
     public void Remove(ICustomSettingsOption customSettingsOption)
@@ -82,122 +77,141 @@ public class CustomSettingsOptionManager
         var customSettingsOptions = _customSettingsOptions.GetValueOrDefault(customSettingsOption.GameMode);
         if (customSettingsOptions == null || !customSettingsOptions.Remove(customSettingsOption))
         {
-            // uhhhhhh, I mean, I'm not complaining, but this shouldn't happen
             return;
         }
 
-        var customOption = customSettingsOption.BoxedCustomOption;
-
-        if (!Find(customOption).Any())
+        customSettingsOption.OnChanged -= CustomSettingsOptionChanged;
+        
+        if (GameOptionsManager.Instance?.currentGameMode != customSettingsOption.GameMode ||
+            !_settingsOptions.ContainsKey(customSettingsOption))
         {
-            customOption.OnChanged -= CustomOptionChanged;
+            return;
+        }
+        
+        var gameObject = _settingsOptions[customSettingsOption];
+        if (gameObject != null)
+        {
+            gameObject.Destroy();
         }
 
-        OnCustomSettingsOptionRemoved?.Invoke(customSettingsOption);
+        _settingsOptions.Remove(customSettingsOption);
     }
 
     public IEnumerable<ICustomSettingsOption> Find(ICustomOption customOption)
     {
-        foreach (var gameMode in Enum.GetValues<GameModes>())
+        foreach (var customSettingsOptions in _customSettingsOptions.Values)
         {
-            if (TryGet(gameMode, customOption, out var customSettingsOption))
+            foreach (var customSettingsOption in customSettingsOptions)
             {
-                yield return customSettingsOption;
+                if (customSettingsOption.BoxedCustomOption == customOption)
+                {
+                    yield return customSettingsOption;
+
+                    break;
+                }
             }
         }
     }
 
     public bool TryGet(
         GameModes gameMode,
+        [NotNullWhen(true)] out ICustomSettingsOption[]? customSettingsOptions)
+    {
+        var result = _customSettingsOptions.TryGetValue(gameMode, out var c);
+        customSettingsOptions = c?.ToArray();
+
+        return result;
+    }
+
+    public bool TryGet(
+        GameModes gameMode,
         ICustomOption customOption,
         [NotNullWhen(true)] out ICustomSettingsOption? customSettingsOption)
-    {
-        if (CustomSettingsOptions.TryGetValue(gameMode, out var customSettingsOptions))
-        {
-            return (customSettingsOption =
-                customSettingsOptions.FirstOrDefault(c => c.BoxedCustomOption == customOption)) != null;
-        }
+        => (customSettingsOption = _customSettingsOptions
+            .GetValueOrDefault(gameMode)
+            ?.FirstOrDefault(c => c.BoxedCustomOption == customOption)) != null;
 
-        customSettingsOption = null;
-        return false;
-    }
-
-    public void RegisterConverter(ICustomSettingsOptionConverter customSettingsOptionConverter)
-    {
-        if (!_converters.Contains(customSettingsOptionConverter))
-        {
-            _converters.Add(customSettingsOptionConverter);
-        }
-    }
-
-    public void RegisterConverters(IEnumerable<ICustomSettingsOptionConverter> customSettingsOptionConverters)
-    {
-        foreach (var converter in customSettingsOptionConverters)
-        {
-            RegisterConverter(converter);
-        }
-    }
-
-    public void UnregisterConverter(ICustomSettingsOptionConverter customSettingsOptionConverter)
-        => _converters.Remove(customSettingsOptionConverter);
-    
-    public bool TryGetConverter<TCustomSettingsOptionConverter>(
-        [NotNullWhen(true)] out TCustomSettingsOptionConverter? customSettingsOptionConverter)
-        where TCustomSettingsOptionConverter : class, ICustomSettingsOptionConverter
-    {
-        return (customSettingsOptionConverter = _converters.FirstOrDefault(c => c is TCustomSettingsOptionConverter)
-            as TCustomSettingsOptionConverter) != null;
-    }
-    
     public void ResetAllOptions(GameModes gameMode)
     {
-        var customSettingsOptions = _customSettingsOptions.GetValueOrDefault(gameMode);
-        if (customSettingsOptions == null)
+        if (!_customSettingsOptions.TryGetValue(gameMode, out var customSettingsOptions))
         {
             return;
         }
-
+        
         foreach (var customSettingsOption in customSettingsOptions)
         {
             customSettingsOption.BoxedCustomOption.ResetValue();
         }
     }
 
-    public bool TryConvertCustomOption(
-        ICustomSettingsOption customSettingsOption,
-        [NotNullWhen(true)] out object? args,
-        Type? returnedConvertedType = null,
-        Type? optionType = null)
-    {
-        var customOptionType = customSettingsOption.BoxedCustomOption.GetType();
+    public bool TryGetSettingsOption(
+        GameObject gameObject,
+        [NotNullWhen(true)] out ICustomSettingsOption? settingsOption)
+        => (settingsOption =
+            _settingsOptions.FirstOrDefault(e => e.Value.IsEqualTo(gameObject)).DefaultToNull()?.Key) != null;
 
-        foreach (var converter in _converters)
+    private void CustomSettingsOptionChanged(ICustomSettingsOption customSettingsOption)
+    {
+        if (GameOptionsManager.Instance?.currentGameMode != customSettingsOption.GameMode ||
+            !_settingsOptions.TryGetValue(customSettingsOption, out var gameObject) ||
+            gameObject.AsFlex() is not SettingsOptionFlex flex)
         {
-            if ((returnedConvertedType == null || converter.ReturnedConvertedType == returnedConvertedType) &&
-                (optionType == null || converter.OptionType == optionType) &&
-                converter.Matches(customOptionType) &&
-                converter.TryConvert(customSettingsOption, out args))
-            {
-                return true;
-            }
+            return;
         }
 
-        args = null;
-        return false;
+        if (customSettingsOption.Order != null)
+        {
+            flex.TrySetOrder(customSettingsOption.Order.Value);
+        }
     }
 
-    private void CustomOptionChanged(ICustomOption customOption)
+    private void TryCreateSettingsOptions(GameModes gameMode)
     {
-        if (customOption.Sync)
+        if (!TryGet(gameMode, out var customSettingsOptions))
         {
-            SyncableManager.Instance.Sync(customOption);
+            return;
         }
 
-        OnCustomOptionChanged?.Invoke(customOption);
-
-        foreach (var customSettingsOption in Find(customOption))
+        var flexContainer = SettingsOptionManager.Instance.FlexContainer;
+        
+        foreach (var customSettingsOption in customSettingsOptions)
         {
-            OnCustomSettingsOptionChanged?.Invoke(customSettingsOption);
+            var customOption = customSettingsOption.BoxedCustomOption;
+
+            if (_settingsOptions.TryGetValue(customSettingsOption, out var gameObject) && gameObject != null)
+            {
+                continue;
+            }
+            
+            if (!SettingsOptionConverterManager.Instance.TryConvert(customSettingsOption, out var optionBehaviour))
+            {
+                Logger<MitochondriaPlugin>.Warning($"Failed to create game object for \"{customOption.Title}\" option");
+                
+                continue;
+            }
+
+            gameObject = optionBehaviour.gameObject;
+            
+            if (gameObject.AsFlex() is not SettingsOptionFlex flex)
+            {
+                // Can't have a game object that's not in the flex container or there'll be overlapping issues
+                gameObject.Destroy();
+
+                Logger<MitochondriaPlugin>.Error($"\"{customOption.Title}\" is not flexible");
+
+                continue;
+            }
+
+            _settingsOptions[customSettingsOption] = gameObject;
+
+            gameObject.name = customOption.Title;
+
+            if (customSettingsOption.Order != null)
+            {
+                flex.TrySetOrder(customSettingsOption.Order.Value);
+            }
+
+            flexContainer.TryAdd(flex);
         }
     }
 }

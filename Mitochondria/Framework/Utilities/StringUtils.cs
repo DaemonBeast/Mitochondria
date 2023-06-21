@@ -1,6 +1,6 @@
 ﻿namespace Mitochondria.Framework.Utilities;
 
-public static class StringUtilities
+public static class StringUtils
 {
     public static string GetFormatString(string prefix = "", string postfix = "")
     {

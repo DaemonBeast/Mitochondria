@@ -14,6 +14,8 @@ public class CustomSettingsOption<TPlugin, TValue> : ICustomSettingsOption<TValu
     public ICustomOption<TValue> CustomOption { get; }
 
     public ICustomOption BoxedCustomOption => CustomOption;
+
+    public event ICustomSettingsOption.ChangedHandler? OnChanged;
     
     public static implicit operator CustomOption<TPlugin, TValue>(CustomSettingsOption<TPlugin, TValue> c) =>
         (CustomOption<TPlugin, TValue>) c.CustomOption;
@@ -26,5 +28,7 @@ public class CustomSettingsOption<TPlugin, TValue> : ICustomSettingsOption<TValu
         GameMode = gameMode;
         Order = order;
         CustomOption = customOption;
+
+        CustomOption.OnChanged += _ => OnChanged?.Invoke(this);
     }
 }

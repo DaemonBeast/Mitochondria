@@ -101,6 +101,11 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
         var oldValue = _value;
         _value = newValue;
 
+        if (Sync)
+        {
+            SyncableManager.Instance.Sync(this);
+        }
+
         OnValueChanged?.Invoke(this, oldValue, newValue);
         OnChanged?.Invoke(this);
     }

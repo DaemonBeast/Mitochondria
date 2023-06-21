@@ -21,7 +21,8 @@ internal static class CustomOptionPatches
                 return false;
             }
             
-            if (!SettingsOptionManager.Instance.TryGetSettingsOption(__instance.gameObject, out var settingsOption))
+            if (!CustomSettingsOptionManager.Instance
+                    .TryGetSettingsOption(__instance.gameObject, out var settingsOption))
             {
                 return true;
             }
@@ -39,7 +40,8 @@ internal static class CustomOptionPatches
     {
         public static void Postfix(NumberOption __instance)
         {
-            if (SettingsOptionManager.Instance.TryGetSettingsOption(__instance.gameObject, out var settingsOption))
+            if (CustomSettingsOptionManager.Instance
+                .TryGetSettingsOption(__instance.gameObject, out var settingsOption))
             {
                 __instance.ValueText.text = settingsOption.BoxedCustomOption.ValueString;
             }
@@ -58,7 +60,8 @@ internal static class CustomOptionPatches
                 return false;
             }
             
-            if (!SettingsOptionManager.Instance.TryGetSettingsOption(__instance.gameObject, out var settingsOption))
+            if (!CustomSettingsOptionManager.Instance
+                    .TryGetSettingsOption(__instance.gameObject, out var settingsOption))
             {
                 return true;
             }

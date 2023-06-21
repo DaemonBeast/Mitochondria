@@ -3,7 +3,7 @@ using Reactor.Utilities;
 
 namespace Mitochondria.Framework.Utilities;
 
-public static class TypeUtilities
+public static class TypeUtils
 {
     public static void RegisterAttribute<TAttribute, TInherits>(
         Assembly assembly,
@@ -27,6 +27,7 @@ public static class TypeUtilities
             if (!type.IsAssignableTo(typeof(TInherits)))
             {
                 invalidCallback.Invoke(type);
+                continue;
             }
             
             callback.Invoke(type);

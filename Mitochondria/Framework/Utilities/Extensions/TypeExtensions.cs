@@ -4,8 +4,22 @@ namespace Mitochondria.Framework.Utilities.Extensions;
 
 public static class TypeExtensions
 {
-    public static bool IsStatic(this PropertyInfo propertyInfo, bool nonPublic = false)
-        => propertyInfo.GetAccessors(nonPublic).Any(m => m.IsStatic);
+    public static bool IsStatic(this MemberInfo memberInfo)
+        => memberInfo switch
+        {
+            EventInfo eventInfo => eventInfo.IsStatic(),
+            FieldInfo fieldInfo => fieldInfo.IsStatic,
+            MethodBase methodBase => methodBase.IsStatic,
+            PropertyInfo propertyInfo => propertyInfo.IsStatic(),
+            _ => throw new ArgumentException(
+                $"Identifying if member of type {memberInfo.GetType()} is static is not supported")
+        };
+
+    public static bool IsStatic(this EventInfo eventInfo)
+        => eventInfo.GetAddMethod()?.IsStatic ?? false;
+    
+    public static bool IsStatic(this PropertyInfo propertyInfo)
+        => propertyInfo.GetAccessors(true).Any(m => m.IsStatic);
 
     public static bool Implements(this Type type, Type interfaceType, string methodName)
     {

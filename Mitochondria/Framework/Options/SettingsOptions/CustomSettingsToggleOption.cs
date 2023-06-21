@@ -14,8 +14,3 @@ public class CustomSettingsToggleOption<TPlugin> : CustomSettingsOption<TPlugin,
     {
     }
 }
-
-public readonly record struct ToggleOptionArgs(
-    StringNames Title,
-    bool Value,
-    Action<ToggleOption>? ValueChangedHandler = null);

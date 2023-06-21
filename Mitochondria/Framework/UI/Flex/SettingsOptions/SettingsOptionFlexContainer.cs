@@ -1,5 +1,5 @@
 ﻿using Mitochondria.Api.UI.Flex;
-using Mitochondria.Framework.Cache;
+using Mitochondria.Framework.Helpers;
 
 namespace Mitochondria.Framework.UI.Flex.SettingsOptions;
 
@@ -68,7 +68,7 @@ public class SettingsOptionFlexContainer : FlexContainer<SettingsOptionFlex>
 
     private void TryChangeMenuHeight()
     {
-        if (!MonoBehaviourProvider.TryGet(out GameOptionsMenu? gameOptionsMenu))
+        if (!GameOptionsMenuHelper.TryGetCurrent(out var gameOptionsMenu))
         {
             return;
         }
@@ -84,7 +84,7 @@ public class SettingsOptionFlexContainer : FlexContainer<SettingsOptionFlex>
 
     private bool TryUpdateLayout()
     {
-        if (!MonoBehaviourProvider.TryGet(out GameOptionsMenu? _))
+        if (!GameOptionsMenuHelper.TryGetCurrent(out _))
         {
             return true;
         }

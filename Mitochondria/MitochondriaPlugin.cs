@@ -5,9 +5,6 @@ using HarmonyLib;
 using Mitochondria.Framework.Options;
 using Mitochondria.Framework.Options.SettingsOptions;
 using Mitochondria.Framework.Options.SettingsOptions.Converters;
-using Mitochondria.Framework.Options.SettingsOptions.Factories;
-using Mitochondria.Framework.Options.SettingsOptions.Providers;
-using Mitochondria.Framework.Options.SettingsOptions.Providers.Handler;
 using Mitochondria.Framework.Plugin;
 using Mitochondria.Framework.Roles;
 using Mitochondria.Framework.Services;
@@ -38,14 +35,9 @@ public partial class MitochondriaPlugin : BasePlugin
         {
             PluginManager.Instance.Add(basePlugin.GetType(), pluginInfo);
             
-            RegisterServiceAttribute.Register(assembly, pluginInfo);
-            
-            RegisterCustomRoleAttribute.Register(assembly);
-            
-            CustomSettingsOptionConverterAttribute.Register(assembly);
-            SettingsOptionProviderAttribute.Register(assembly);
-            SettingsOptionFactoryAttribute.Register(assembly);
-            SettingsOptionHandlerProviderAttribute.Register(assembly);
+            ServiceAttribute.Register(assembly, pluginInfo);
+            CustomRoleAttribute.Register(assembly);
+            SettingsOptionConverterAttribute.Register(assembly);
         };
 
         IL2CPPChainloader.Instance.PluginLoaded += pluginInfo =>

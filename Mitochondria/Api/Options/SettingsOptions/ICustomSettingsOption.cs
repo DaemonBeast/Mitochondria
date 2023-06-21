@@ -15,4 +15,8 @@ public interface ICustomSettingsOption
     public int? Order { get; }
 
     public ICustomOption BoxedCustomOption { get; }
+    
+    public delegate void ChangedHandler(ICustomSettingsOption customSettingsOption);
+
+    public event ChangedHandler? OnChanged;
 }

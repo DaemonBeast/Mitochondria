@@ -1,67 +1,37 @@
 ﻿using HarmonyLib;
 using Il2CppInterop.Runtime;
-using Mitochondria.Framework.Cache;
 using Mitochondria.Framework.Options.SettingsOptions;
-using Mitochondria.Framework.Options.SettingsOptions.Providers;
 using Mitochondria.Framework.UI.Extensions;
 using Mitochondria.Framework.UI.Flex.SettingsOptions;
 using Mitochondria.Framework.Utilities.Extensions;
-using Reactor.Utilities.Extensions;
-using Object = UnityEngine.Object;
 
 namespace Mitochondria.Patches.Options;
 
 internal static class SettingsOptionPatches
 {
-    public delegate void GameOptionsMenuOpenedHandler(GameOptionsMenu gameOptionsMenu);
-
-    public static event GameOptionsMenuOpenedHandler? PreGameOptionsMenuOpened;
-    public static event GameOptionsMenuOpenedHandler? PostGameOptionsMenuOpened;
-
     [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Start))]
     public static class FlexPatch
     {
+        [HarmonyPriority(Priority.VeryHigh)]
         public static void Prefix(GameOptionsMenu __instance)
         {
-            PreGameOptionsMenuOpened?.Invoke(__instance);
-            
-            // Note that there are multiple objects of type `GameOptionsMenu`
-            // and the currently active one will be cached as appropriate
-            MonoBehaviourProvider.Set(__instance);
-            
-            if (MonoBehaviourProvider.TryGet(out GameSettingMenu? gameSettingMenu))
+            var gameSettingMenu = GameSettingMenu.Instance;
+            if (gameSettingMenu != null)
             {
                 // TODO: Add `KeyValueOption` and `PlayerOption`?
-                
-                var originalNumberOption = __instance.GetComponentInChildren<NumberOption>(true);
-                var originalToggleOption = __instance.GetComponentsInChildren<ToggleOption>(true).ElementAtOrDefault(1);
-                var originalStringOption = gameSettingMenu.GetComponentInChildren<StringOption>(true);
 
-                // Could probably be somewhat abstracted, but that's too much effort
-                
-                if (originalNumberOption != null)
-                {
-                    var clone = Object.Instantiate(originalNumberOption.gameObject).DontDestroy();
-                    clone.SetActive(false);
+                __instance
+                    .GetComponentInChildren<NumberOption>(true)
+                    .ThenIfNotNull(n => SettingsOptionPrototypeManager.Instance.CloneAndSet<NumberOption>(n));
 
-                    CloneSettingsOptionProviderHelper.NumberOptionTemplate = clone;
-                }
+                __instance
+                    .GetComponentsInChildren<ToggleOption>(true)
+                    .ElementAtOrDefault(1)
+                    .ThenIfNotNull(t => SettingsOptionPrototypeManager.Instance.CloneAndSet<ToggleOption>(t));
 
-                if (originalToggleOption != null)
-                {
-                    var clone = Object.Instantiate(originalToggleOption.gameObject).DontDestroy();
-                    clone.SetActive(false);
-
-                    CloneSettingsOptionProviderHelper.ToggleOptionTemplate = clone;
-                }
-
-                if (originalStringOption != null)
-                {
-                    var clone = Object.Instantiate(originalStringOption.gameObject).DontDestroy();
-                    clone.SetActive(false);
-
-                    CloneSettingsOptionProviderHelper.StringOptionTemplate = clone;
-                }
+                gameSettingMenu
+                    .GetComponentInChildren<StringOption>(true)
+                    .ThenIfNotNull(s => SettingsOptionPrototypeManager.Instance.CloneAndSet<StringOption>(s));
             }
 
             var flex = (IEnumerable<SettingsOptionFlex>) __instance
@@ -70,11 +40,6 @@ internal static class SettingsOptionPatches
                 .Where(f => f != null);
 
             SettingsOptionManager.Instance.FlexContainer.TryAddRange(flex);
-        }
-
-        public static void Postfix(GameOptionsMenu __instance)
-        {
-            PostGameOptionsMenuOpened?.Invoke(__instance);
         }
     }
     
@@ -105,7 +70,8 @@ internal static class SettingsOptionPatches
                 buttonGameObject.SetActive(false);
             }
 
-            if ((!SettingsOptionManager.Instance.TryGetSettingsOption(__instance.gameObject, out var settingsOption) ||
+            if ((!CustomSettingsOptionManager.Instance
+                     .TryGetSettingsOption(__instance.gameObject, out var settingsOption) ||
                  settingsOption.BoxedCustomOption.HostOnly) &&
                 !isRoleOptionSetting &&
                 __instance.TryGetComponent(Il2CppType.Of<PassiveButton>(), out var b))
