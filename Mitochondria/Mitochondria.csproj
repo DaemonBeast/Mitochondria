@@ -9,10 +9,10 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         
-        <VersionPrefix>0.3.0</VersionPrefix>
-        <VersionSuffix>dev</VersionSuffix>
         <Description>API for Among Us mods</Description>
         <Authors>Daemon</Authors>
+
+        <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <ItemGroup>
