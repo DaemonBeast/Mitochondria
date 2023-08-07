@@ -1,6 +1,6 @@
 ﻿using Hazel;
 
-namespace Mitochondria.Api.Networking;
+namespace Mitochondria.Api.Serialization;
 
 public interface ISerializable
 {

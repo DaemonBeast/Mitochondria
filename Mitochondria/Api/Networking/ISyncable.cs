@@ -1,4 +1,6 @@
-﻿namespace Mitochondria.Api.Networking;
+﻿using Mitochondria.Api.Serialization;
+
+namespace Mitochondria.Api.Networking;
 
 public interface ISyncable : ISerializable
 {
