@@ -1,4 +1,5 @@
-﻿using Mitochondria.Api.Storage;
+﻿using System.Runtime.CompilerServices;
+using Mitochondria.Api.Storage;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -10,6 +11,8 @@ public class YamlStorage : IStorage
 
     private readonly ISerializer _serializer;
     private readonly IDeserializer _deserializer;
+
+    private readonly ConditionalWeakTable<string, object> _cache;
 
     public YamlStorage(YamlStorageConfiguration storageConfiguration)
     {
@@ -23,11 +26,15 @@ public class YamlStorage : IStorage
             .IgnoreUnmatchedProperties()
             .WithNamingConvention(PascalCaseNamingConvention.Instance)
             .Build();
+
+        _cache = new ConditionalWeakTable<string, object>();
     }
 
     public void Save(string fileName, object obj)
     {
         var savePath = StorageConfiguration.GetAbsoluteSavePath(fileName);
+        _cache.AddOrUpdate(savePath, obj);
+        
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
         using var streamWriter = File.CreateText(savePath);
@@ -37,6 +44,13 @@ public class YamlStorage : IStorage
     public T Load<T>(string fileName, IEnumerable<string>? altFileNames = null)
         where T : class
     {
+        if (_cache.TryGetValue(
+                StorageConfiguration.GetAbsoluteSavePath(fileName),
+                out var cachedObj) && cachedObj is T typedObj)
+        {
+            return typedObj;
+        }
+        
         foreach (var path in StorageConfiguration.GetAbsoluteLoadPaths(fileName, altFileNames))
         {
             if (!File.Exists(path))
@@ -59,6 +73,7 @@ public class YamlStorage : IStorage
                 }
 
                 Save(fileName, obj);
+                _cache.AddOrUpdate(StorageConfiguration.GetAbsoluteSavePath(fileName), obj);
 
                 return obj;
             }
@@ -69,8 +84,23 @@ public class YamlStorage : IStorage
         }
 
         var newObj = (T) Activator.CreateInstance(typeof(T), true)!;
-        Save(fileName, newObj);
+
+        Save(StorageConfiguration.GetAbsoluteSavePath(fileName), newObj);
+        _cache.AddOrUpdate(fileName, newObj);
 
         return newObj;
+    }
+
+    public void Delete(string fileName, IEnumerable<string>? altFileNames = null)
+    {
+        _cache.Remove(StorageConfiguration.GetAbsoluteSavePath(fileName));
+
+        foreach (var path in StorageConfiguration.GetAbsoluteLoadPaths(fileName, altFileNames))
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
     }
 }

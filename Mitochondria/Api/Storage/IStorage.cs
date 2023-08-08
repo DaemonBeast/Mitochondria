@@ -6,4 +6,6 @@ public interface IStorage
 
     public T Load<T>(string fileName, IEnumerable<string>? altFileNames = null)
         where T : class;
+
+    public void Delete(string fileName, IEnumerable<string>? altFileNames = null);
 }
