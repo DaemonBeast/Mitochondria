@@ -10,6 +10,8 @@ public static class PluginManager<TPlugin>
 {
     public static PluginInfo PluginInfo => _pluginInfo ??= PluginManager.Instance.GetPluginInfo<TPlugin>()!;
 
+    public static string PluginId => PluginInfo.Metadata.GUID;
+
     // ReSharper disable once StaticMemberInGenericType
     private static PluginInfo? _pluginInfo;
 }

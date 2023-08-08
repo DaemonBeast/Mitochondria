@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using Mitochondria.Api.Storage;
+using Reactor.Utilities;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -46,7 +47,8 @@ public class YamlStorage : IStorage
     {
         if (_cache.TryGetValue(
                 StorageConfiguration.GetAbsoluteSavePath(fileName),
-                out var cachedObj) && cachedObj is T typedObj)
+                out var cachedObj) &&
+            cachedObj is T typedObj)
         {
             return typedObj;
         }
@@ -73,7 +75,6 @@ public class YamlStorage : IStorage
                 }
 
                 Save(fileName, obj);
-                _cache.AddOrUpdate(StorageConfiguration.GetAbsoluteSavePath(fileName), obj);
 
                 return obj;
             }
@@ -85,8 +86,7 @@ public class YamlStorage : IStorage
 
         var newObj = (T) Activator.CreateInstance(typeof(T), true)!;
 
-        Save(StorageConfiguration.GetAbsoluteSavePath(fileName), newObj);
-        _cache.AddOrUpdate(fileName, newObj);
+        Save(fileName, newObj);
 
         return newObj;
     }
