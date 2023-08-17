@@ -4,7 +4,7 @@ using Mitochondria.Framework.Helpers;
 using Mitochondria.Framework.Utilities;
 using Reactor.Utilities;
 
-namespace Mitochondria.Framework.Options.SettingsOptions;
+namespace Mitochondria.Framework.Options.SettingsOptions.Managers;
 
 public class SettingsOptionConverterManager
 {

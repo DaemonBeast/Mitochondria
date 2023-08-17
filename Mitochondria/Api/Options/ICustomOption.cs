@@ -24,6 +24,10 @@ public interface ICustomOption : IOwned, ISyncable
     public string ValueString { get; }
     
     public Type ValueType { get; }
+
+    public object BoxedValue { get; set; }
+
+    public object BoxedDefaultValue { get; }
     
     public string FormatString { get; }
     

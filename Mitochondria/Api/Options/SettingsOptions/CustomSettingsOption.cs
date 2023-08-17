@@ -1,5 +1,6 @@
 ﻿using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP;
+using Mitochondria.Framework.Utilities.Extensions;
 
 namespace Mitochondria.Api.Options.SettingsOptions;
 
@@ -30,5 +31,7 @@ public class CustomSettingsOption<TPlugin, TValue> : ICustomSettingsOption<TValu
         CustomOption = customOption;
 
         CustomOption.OnChanged += _ => OnChanged?.Invoke(this);
+
+        this.SetOwner<TPlugin>();
     }
 }

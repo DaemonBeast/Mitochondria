@@ -2,6 +2,7 @@
 using AmongUs.GameOptions;
 using Mitochondria.Api.Options;
 using Mitochondria.Api.Options.SettingsOptions;
+using Mitochondria.Framework.Configuration;
 using Mitochondria.Framework.Helpers;
 using Mitochondria.Framework.UI.Extensions;
 using Mitochondria.Framework.UI.Flex.SettingsOptions;
@@ -11,7 +12,7 @@ using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
 
-namespace Mitochondria.Framework.Options.SettingsOptions;
+namespace Mitochondria.Framework.Options.SettingsOptions.Managers;
 
 public class CustomSettingsOptionManager
 {
@@ -27,7 +28,7 @@ public class CustomSettingsOptionManager
     {
         _customSettingsOptions = new Dictionary<GameModes, List<ICustomSettingsOption>>();
         _settingsOptions = new Dictionary<ICustomSettingsOption, GameObject>();
-        
+
         GameOptionsMenuHelper.OnAfterOpened += () =>
         {
             if (GameOptionsManager.Instance != null)
@@ -65,7 +66,22 @@ public class CustomSettingsOptionManager
         customSettingsOption.OnChanged += CustomSettingsOptionChanged;
 
         customSettingsOptions.Add(customSettingsOption);
-        
+
+        var config = Config.Instance.Of(customSettingsOption.GetOwner()!.Instance.GetType());
+        var customSettingsOptionsConfig = config.Load<CustomSettingsOptionsConfig>();
+        var customSettings = customSettingsOptionsConfig.CustomSettings;
+
+        if (customSettings.TryGetValue(customOption.Title, out var value))
+        {
+            customOption.BoxedValue = value;
+        }
+        else
+        {
+            customSettings.Add(customOption.Title, customOption.BoxedValue);
+        }
+
+        config.Save(customSettingsOptionsConfig);
+
         if (GameOptionsManager.Instance?.currentGameMode == customSettingsOption.GameMode)
         {
             TryCreateSettingsOptions(customSettingsOption.GameMode);
@@ -87,7 +103,12 @@ public class CustomSettingsOptionManager
         {
             return;
         }
-        
+
+        var config = Config.Instance.Of(customSettingsOption.GetOwner()!.Instance.GetType());
+        var customSettingsOptionsConfig = config.Load<CustomSettingsOptionsConfig>();
+        customSettingsOptionsConfig.CustomSettings.Remove(customSettingsOption.BoxedCustomOption.Title);
+        config.Save(customSettingsOptionsConfig);
+
         var gameObject = _settingsOptions[customSettingsOption];
         if (gameObject != null)
         {
@@ -163,6 +184,12 @@ public class CustomSettingsOptionManager
         {
             flex.TrySetOrder(customSettingsOption.Order.Value);
         }
+
+        var customOption = customSettingsOption.BoxedCustomOption;
+        var config = Config.Instance.Of(customSettingsOption.GetOwner()!.Instance.GetType());
+        var customSettingsOptionsConfig = config.Load<CustomSettingsOptionsConfig>();
+        customSettingsOptionsConfig.CustomSettings[customOption.Title] = customOption.BoxedValue;
+        config.Save(customSettingsOptionsConfig);
     }
 
     private void TryCreateSettingsOptions(GameModes gameMode)

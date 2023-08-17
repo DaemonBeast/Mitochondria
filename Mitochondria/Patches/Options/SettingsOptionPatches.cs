@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Mitochondria.Framework.Options.SettingsOptions;
+using Mitochondria.Framework.Options.SettingsOptions.Managers;
 using Mitochondria.Framework.UI.Extensions;
 using Mitochondria.Framework.UI.Flex.SettingsOptions;
 using Mitochondria.Framework.Utilities.Extensions;

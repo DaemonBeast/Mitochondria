@@ -1,5 +1,6 @@
 ﻿using Il2CppInterop.Runtime.Attributes;
 using Mitochondria.Framework.Options.SettingsOptions;
+using Mitochondria.Framework.Options.SettingsOptions.Managers;
 using Reactor.Utilities.Attributes;
 using UnityEngine;
 

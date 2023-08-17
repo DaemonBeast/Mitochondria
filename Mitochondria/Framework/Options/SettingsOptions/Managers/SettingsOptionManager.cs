@@ -1,7 +1,7 @@
 ﻿using Mitochondria.Framework.UI.Flex.SettingsOptions;
 using Mitochondria.Framework.Utilities;
 
-namespace Mitochondria.Framework.Options.SettingsOptions;
+namespace Mitochondria.Framework.Options.SettingsOptions.Managers;
 
 public class SettingsOptionManager
 {

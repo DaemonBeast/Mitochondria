@@ -4,7 +4,7 @@ using Reactor.Utilities.Extensions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Mitochondria.Framework.Options.SettingsOptions;
+namespace Mitochondria.Framework.Options.SettingsOptions.Managers;
 
 public class SettingsOptionPrototypeManager
 {

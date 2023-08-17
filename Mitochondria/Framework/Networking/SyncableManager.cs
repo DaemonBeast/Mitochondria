@@ -47,7 +47,8 @@ public class SyncableManager
             return;
         }
 
-        if (syncable.HostOnly && !AmongUsClient.Instance.AmHost)
+        if (!AmongUsClient.Instance ||
+            syncable.HostOnly && !AmongUsClient.Instance.AmHost)
         {
             return;
         }

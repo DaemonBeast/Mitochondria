@@ -1,6 +1,7 @@
 ﻿using AmongUs.GameOptions;
 using HarmonyLib;
 using Mitochondria.Framework.Options.SettingsOptions;
+using Mitochondria.Framework.Options.SettingsOptions.Managers;
 
 namespace Mitochondria.Patches.Options;
 

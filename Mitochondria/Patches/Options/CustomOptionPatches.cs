@@ -3,6 +3,7 @@ using AmongUs.GameOptions;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Mitochondria.Framework.Options.SettingsOptions;
+using Mitochondria.Framework.Options.SettingsOptions.Managers;
 using UnityEngine;
 
 namespace Mitochondria.Patches.Options;

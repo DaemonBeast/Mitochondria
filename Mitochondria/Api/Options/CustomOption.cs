@@ -19,6 +19,14 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
 
     public Type ValueType { get; }
 
+    public object BoxedValue
+    {
+        get => Value;
+        set => Value = (TValue) Convert.ChangeType(value, typeof(TValue));
+    }
+
+    public object BoxedDefaultValue => DefaultValue;
+
     public string FormatString { get; }
 
     public bool Sync { get; }

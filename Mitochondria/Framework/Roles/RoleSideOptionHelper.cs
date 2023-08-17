@@ -3,6 +3,7 @@ using BepInEx.Unity.IL2CPP;
 using Mitochondria.Api.Roles;
 using Mitochondria.Framework.Options;
 using Mitochondria.Framework.Options.SettingsOptions;
+using Mitochondria.Framework.Options.SettingsOptions.Managers;
 
 namespace Mitochondria.Framework.Roles;
 

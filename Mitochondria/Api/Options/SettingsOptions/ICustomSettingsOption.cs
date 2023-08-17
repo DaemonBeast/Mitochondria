@@ -1,4 +1,5 @@
 ﻿using AmongUs.GameOptions;
+using Mitochondria.Api.Owner;
 
 namespace Mitochondria.Api.Options.SettingsOptions;
 
@@ -8,7 +9,7 @@ public interface ICustomSettingsOption<TValue> : ICustomSettingsOption
     public ICustomOption<TValue> CustomOption { get; }
 }
 
-public interface ICustomSettingsOption
+public interface ICustomSettingsOption : IOwned
 {
     public GameModes GameMode { get; }
     
