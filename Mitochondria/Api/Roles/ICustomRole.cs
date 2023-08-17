@@ -11,7 +11,7 @@ public interface ICustomRole
     
     public Type RoleSideType { get; }
 
-    public SpriteReference? Icon { get; }
+    public SpriteProvider? Icon { get; }
     
     public int MaxAmount { get; }
 

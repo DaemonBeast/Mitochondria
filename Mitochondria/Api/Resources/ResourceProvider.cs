@@ -1,6 +1,6 @@
 ﻿namespace Mitochondria.Api.Resources;
 
-public abstract class ResourceReference<T> : IResourceReference<T>
+public abstract class ResourceProvider<T> : IResourceProvider<T>
     where T : class
 {
     public abstract T Load(bool useCached = true);
@@ -17,13 +17,13 @@ public abstract class ResourceReference<T> : IResourceReference<T>
     }
 }
 
-public interface IResourceReference<out T> : IResourceReference
+public interface IResourceProvider<out T> : IResourceProvider
     where T : class
 {
     public T Load(bool useCached = true);
 }
 
-public interface IResourceReference
+public interface IResourceProvider
 {
     public object LoadBoxed(bool useCached = true);
 

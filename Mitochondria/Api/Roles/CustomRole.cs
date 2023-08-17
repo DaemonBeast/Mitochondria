@@ -13,7 +13,7 @@ public abstract class CustomRole<TRoleSide> : ICustomRole
     
     public Type RoleSideType { get; }
 
-    public SpriteReference? Icon { get; }
+    public SpriteProvider? Icon { get; }
 
     public int MaxAmount { get; }
 
@@ -21,7 +21,7 @@ public abstract class CustomRole<TRoleSide> : ICustomRole
 
     private IRoleSide? _roleSide;
 
-    protected CustomRole(ICustomRoleDescription description, SpriteReference? icon = null, int maxAmount = int.MaxValue)
+    protected CustomRole(ICustomRoleDescription description, SpriteProvider? icon = null, int maxAmount = int.MaxValue)
     {
         Description = description;
         RoleSideType = typeof(TRoleSide);

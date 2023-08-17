@@ -4,17 +4,17 @@ using UnityEngine;
 
 namespace Mitochondria.Framework.Resources.Sprites;
 
-public class AssetBundleReferenceSpriteReference : SpriteReference
+public class AssetBundleSpriteProvider : SpriteProvider
 {
-    public AssetBundleReference AssetBundleReference { get; }
+    public AssetBundleProvider AssetBundleProvider { get; }
     
     public string Name { get; }
 
     private Sprite? _sprite;
 
-    public AssetBundleReferenceSpriteReference(AssetBundleReference assetBundleReference, string name)
+    public AssetBundleSpriteProvider(AssetBundleProvider assetBundleProvider, string name)
     {
-        AssetBundleReference = assetBundleReference;
+        AssetBundleProvider = assetBundleProvider;
         Name = name;
     }
     
@@ -25,11 +25,11 @@ public class AssetBundleReferenceSpriteReference : SpriteReference
             return _sprite;
         }
 
-        return _sprite = AssetBundleReference.Load(useCached).LoadAsset<Sprite>(Name)!;
+        return _sprite = AssetBundleProvider.Load(useCached).LoadAsset<Sprite>(Name)!;
     }
     
     public override int GetHashCode()
     {
-        return (typeof(AssetBundleReferenceSpriteReference), AssetBundleReference, Name).GetHashCode();
+        return (typeof(AssetBundleSpriteProvider), AssetBundleReference: AssetBundleProvider, Name).GetHashCode();
     }
 }

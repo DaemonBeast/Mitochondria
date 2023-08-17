@@ -2,7 +2,7 @@
 
 namespace Mitochondria.Framework.Resources.Sprites;
 
-public class EmptySpriteReference : SpriteReference
+public class EmptySpriteProvider : SpriteProvider
 {
     private Sprite? _sprite;
     

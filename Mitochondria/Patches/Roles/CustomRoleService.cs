@@ -73,7 +73,7 @@ public class CustomRoleService : IService
         var customRoleDescription = customRole.Description;
         
         var abilityButtonSettings = ScriptableObject.CreateInstance<AbilityButtonSettings>();
-        abilityButtonSettings.Image = (customRole.Icon ?? SpriteReference.Empty).Load();
+        abilityButtonSettings.Image = (customRole.Icon ?? Assets.Sprites.Empty).Load();
         abilityButtonSettings.Text = customRole.Description.TitleName;
 
         var roleBehaviour = roleObject.AddComponent<CrewmateRole>();
