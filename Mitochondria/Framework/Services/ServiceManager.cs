@@ -37,16 +37,14 @@ public class ServiceManager
         service.SetOwner(pluginInfo);
         _services[serviceType] = service;
 
-        var serviceNamespace = typeof(IService).FullName!;
-
         var methods = serviceType
             .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-            .Where(m => m.Name.StartsWith(serviceNamespace) && service.GetType().Implements(typeof(IService), m));
+            .Where(m => service.GetType().Implements(typeof(IService), m));
 
         foreach (var method in methods)
         {
             _serviceMethods
-                .GetOrCreate(method.Name[(serviceNamespace.Length + 1)..], _ => new List<Action<object?[]?>>())
+                .GetOrCreate(method.Name[(method.Name.LastIndexOf('.') + 1)..], _ => new List<Action<object?[]?>>())
                 .Add(args => method.Invoke(service, args));
         }
     }

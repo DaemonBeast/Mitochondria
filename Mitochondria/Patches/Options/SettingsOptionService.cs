@@ -19,7 +19,7 @@ public class SettingsOptionService : IService
         _orderCounter = 0;
     }
 
-    void IService.OnPluginLoaded(PluginInfo pluginInfo)
+    public void OnPluginLoaded(PluginInfo pluginInfo)
     {
         FlexGameObjectManager.Instance.DefineFlex<OptionBehaviour>(
             CreateSettingsOptionFlex,

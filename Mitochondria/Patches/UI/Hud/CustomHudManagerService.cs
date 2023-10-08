@@ -7,7 +7,7 @@ namespace Mitochondria.Patches.UI.Hud;
 [Service]
 public class CustomHudManagerService : IService
 {
-    void IService.OnUpdate()
+    public void OnUpdate()
     {
         CustomHudManager.Instance.MainActionButtonsContainer.CreateActionButtons();
     }

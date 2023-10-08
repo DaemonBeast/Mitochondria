@@ -7,7 +7,7 @@ namespace Mitochondria.Patches.Binding;
 [Service]
 public class BindingService : IService
 {
-    void IService.OnUpdate()
+    public void OnUpdate()
     {
         var bindings = Binder.Instance.Bindings;
 

@@ -14,7 +14,7 @@ namespace Mitochondria.Patches.Options;
 [Service]
 public class CustomSettingsOptionService : IService
 {
-    void IService.OnStart()
+    public void OnStart()
     {
         AddOptionsWithAttribute();
     }

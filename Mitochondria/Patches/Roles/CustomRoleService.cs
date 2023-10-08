@@ -30,7 +30,7 @@ public class CustomRoleService : IService
         CustomRoleManager.Instance.OnCustomRoleRegistered += CustomRoleRegistered;
     }
 
-    void IService.OnHudStart(HudManager hudManager)
+    public void OnHudStart(HudManager hudManager)
     {
         if (_addedRoles)
         {

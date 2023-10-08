@@ -8,7 +8,7 @@ namespace Mitochondria.Patches.UI.Hud.Buttons;
 [Service]
 public class ActionButtonService : IService
 {
-    void IService.OnUpdate()
+    public void OnUpdate()
     {
         foreach (var button in CustomHudManager.Instance.MainActionButtonsContainer.Children)
         {
