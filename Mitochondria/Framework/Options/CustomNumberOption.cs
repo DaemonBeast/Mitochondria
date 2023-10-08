@@ -17,13 +17,14 @@ public class CustomNumberOption<TPlugin> : CustomOption<TPlugin, float>, ICustom
     public bool ZeroIsInfinity { get; }
 
     public CustomNumberOption(
+        string id,
         string title,
         float value,
         FloatRange range,
         float step = 1f,
         string? formatString = null,
         bool zeroIsInfinity = false,
-        bool sync = true) : base(title, value, formatString, sync)
+        bool sync = true) : base(id, title, value, formatString, sync)
     {
         Range = range;
         Step = step;

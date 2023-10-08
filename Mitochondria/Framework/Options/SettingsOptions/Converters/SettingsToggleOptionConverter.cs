@@ -1,42 +1,36 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Mitochondria.Api.Binding;
 using Mitochondria.Api.Options.SettingsOptions;
-using Mitochondria.Framework.Options.SettingsOptions.Managers;
-using UnityEngine;
+using Mitochondria.Framework.Binding;
+using Mitochondria.Framework.Prototypes;
 
 namespace Mitochondria.Framework.Options.SettingsOptions.Converters;
 
-[SettingsOptionConverter]
-public class SettingsToggleOptionConverter : ISettingsOptionConverter
+[Converter]
+public class SettingsToggleOptionConverter : ISettingsOptionConverter<ToggleOption>
 {
-    public bool CanConvert(Type typeToConvert)
-        => typeof(ICustomSettingsOption<bool>).IsAssignableFrom(typeToConvert);
+    public Type ConvertedType => typeof(ToggleOption);
 
     public bool ConvertsTo(Type convertedType)
         => convertedType.IsAssignableFrom(typeof(ToggleOption));
 
     public bool TryConvert(
         object objToConvert,
-        [NotNullWhen(true)] out OptionBehaviour? settingsOption,
-        Transform? parent = null)
+        [NotNullWhen(true)] out ToggleOption? convertedObj,
+        TransformConvertArgs convertArgs)
     {
         if (objToConvert is not ICustomSettingsOption<bool> { CustomOption: { } customToggleOption } ||
-            !SettingsOptionPrototypeManager.Instance.TryCloneAndGet<ToggleOption>(out var toggleOption, parent))
+            !PrototypeManager.Instance.TryCloneAndGet<ToggleOption>(out var toggleOption, convertArgs.Parent))
         {
-            settingsOption = null;
+            convertedObj = null;
             return false;
         }
 
         toggleOption.Title = customToggleOption.TitleName;
         toggleOption.TitleText.text = customToggleOption.Title;
         toggleOption.CheckMark.enabled = customToggleOption.Value;
-        
-        SettingsOptionConverterHelper.Bind(
-            toggleOption,
-            customToggleOption,
-            () => customToggleOption.Value = toggleOption.CheckMark.enabled,
-            () => toggleOption.CheckMark.enabled = customToggleOption.Value);
 
-        settingsOption = toggleOption;
+        convertedObj = toggleOption;
         return true;
     }
 }

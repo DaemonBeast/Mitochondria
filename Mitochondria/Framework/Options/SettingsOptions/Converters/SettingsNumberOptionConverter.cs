@@ -1,28 +1,28 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Mitochondria.Api.Binding;
 using Mitochondria.Api.Options.SettingsOptions;
-using Mitochondria.Framework.Options.SettingsOptions.Managers;
-using UnityEngine;
+using Mitochondria.Framework.Binding;
+using Mitochondria.Framework.Prototypes;
 
 namespace Mitochondria.Framework.Options.SettingsOptions.Converters;
 
-[SettingsOptionConverter]
-public class SettingsNumberOptionConverter : ISettingsOptionConverter
+[Converter]
+public class SettingsNumberOptionConverter : ISettingsOptionConverter<NumberOption>
 {
-    public bool CanConvert(Type typeToConvert)
-        => typeof(ICustomSettingsOption<float>).IsAssignableFrom(typeToConvert);
+    public Type ConvertedType => typeof(NumberOption);
 
     public bool ConvertsTo(Type convertedType)
         => convertedType.IsAssignableFrom(typeof(NumberOption));
 
     public bool TryConvert(
         object objToConvert,
-        [NotNullWhen(true)] out OptionBehaviour? settingsOption,
-        Transform? parent = null)
+        [NotNullWhen(true)] out NumberOption? convertedObj,
+        TransformConvertArgs convertArgs)
     {
         if (objToConvert is not ICustomSettingsOption<float> { CustomOption: ICustomNumberOption customNumberOption } ||
-            !SettingsOptionPrototypeManager.Instance.TryCloneAndGet<NumberOption>(out var numberOption, parent))
+            !PrototypeManager.Instance.TryCloneAndGet<NumberOption>(out var numberOption, convertArgs.Parent))
         {
-            settingsOption = null;
+            convertedObj = null;
             return false;
         }
 
@@ -33,13 +33,7 @@ public class SettingsNumberOptionConverter : ISettingsOptionConverter
         numberOption.Increment = customNumberOption.Step;
         numberOption.ZeroIsInfinity = customNumberOption.ZeroIsInfinity;
 
-        SettingsOptionConverterHelper.Bind(
-            numberOption,
-            customNumberOption,
-            () => customNumberOption.Value = numberOption.Value,
-            () => numberOption.Value = customNumberOption.Value);
-
-        settingsOption = numberOption;
+        convertedObj = numberOption;
         return true;
     }
 }

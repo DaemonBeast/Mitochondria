@@ -16,6 +16,7 @@ public static class RoleSideOptionHelper
     {
         return roleSide => new CustomNumberOption<TPlugin>(
             $"# {roleSide.PluralTitle}",
+            $"# {roleSide.PluralTitle}",
             defaultAmount,
             new FloatRange(0, maxAmount));
     }

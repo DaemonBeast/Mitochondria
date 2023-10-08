@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using Il2CppInterop.Runtime;
-using Mitochondria.Framework.Options.SettingsOptions;
 using Mitochondria.Framework.Options.SettingsOptions.Managers;
+using Mitochondria.Framework.Prototypes;
 using Mitochondria.Framework.UI.Extensions;
 using Mitochondria.Framework.UI.Flex.SettingsOptions;
 using Mitochondria.Framework.Utilities.Extensions;
@@ -23,16 +23,16 @@ internal static class SettingsOptionPatches
 
                 __instance
                     .GetComponentInChildren<NumberOption>(true)
-                    .ThenIfNotNull(n => SettingsOptionPrototypeManager.Instance.CloneAndSet<NumberOption>(n));
+                    .ThenIfNotNull(n => PrototypeManager.Instance.CloneAndSet(n));
 
                 __instance
                     .GetComponentsInChildren<ToggleOption>(true)
                     .ElementAtOrDefault(1)
-                    .ThenIfNotNull(t => SettingsOptionPrototypeManager.Instance.CloneAndSet<ToggleOption>(t));
+                    .ThenIfNotNull(t => PrototypeManager.Instance.CloneAndSet(t));
 
                 gameSettingMenu
                     .GetComponentInChildren<StringOption>(true)
-                    .ThenIfNotNull(s => SettingsOptionPrototypeManager.Instance.CloneAndSet<StringOption>(s));
+                    .ThenIfNotNull(s => PrototypeManager.Instance.CloneAndSet(s));
             }
 
             var flex = (IEnumerable<SettingsOptionFlex>) __instance

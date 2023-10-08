@@ -14,7 +14,7 @@ public static class TypeUtils
     {
         var invalidCallback = invalidTypeCallback ??
                               (type => Logger<MitochondriaPlugin>.Error(
-                                  $"Type {type.Name} has {nameof(TAttribute)} but doesn't extend {nameof(TInherits)}"));
+                                  $"Type {type.Name} has {typeof(TAttribute).Name} but doesn't extend {typeof(TInherits).FullName}"));
         
         foreach (var type in assembly.GetTypes())
         {

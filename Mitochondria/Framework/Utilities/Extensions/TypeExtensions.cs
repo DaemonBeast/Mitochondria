@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Il2CppInterop.Runtime;
 
 namespace Mitochondria.Framework.Utilities.Extensions;
 
@@ -33,5 +34,31 @@ public static class TypeExtensions
     public static bool Implements(this Type type, Type interfaceType, MethodInfo methodInfo)
     {
         return type.GetInterfaceMap(interfaceType).TargetMethods.Contains(methodInfo);
+    }
+
+    public static IEnumerable<Type> GetParents(this Type type, bool includeSelf = false, bool includeInterfaces = false)
+    {
+        if (includeSelf)
+        {
+            yield return type;
+        }
+
+        var currentType = type.BaseType;
+        var parentType = currentType?.BaseType;
+
+        while (parentType != null)
+        {
+            yield return currentType!;
+            currentType = parentType;
+            parentType = parentType.BaseType;
+        }
+
+        if (includeInterfaces)
+        {
+            foreach (var typeInterface in type.GetInterfaces())
+            {
+                yield return typeInterface;
+            }
+        }
     }
 }

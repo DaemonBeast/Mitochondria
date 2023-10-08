@@ -1,31 +1,31 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Mitochondria.Api.Binding;
 using Mitochondria.Api.Options.SettingsOptions;
-using Mitochondria.Framework.Options.SettingsOptions.Managers;
-using UnityEngine;
+using Mitochondria.Framework.Binding;
+using Mitochondria.Framework.Prototypes;
 
 namespace Mitochondria.Framework.Options.SettingsOptions.Converters;
 
-[SettingsOptionConverter]
-public class SettingsStringOptionConverter : ISettingsOptionConverter
+[Converter]
+public class SettingsStringOptionConverter : ISettingsOptionConverter<StringOption>
 {
-    public bool CanConvert(Type typeToConvert)
-        => typeof(ICustomSettingsOption<string>).IsAssignableFrom(typeToConvert);
+    public Type ConvertedType => typeof(StringOption);
 
     public bool ConvertsTo(Type convertedType)
         => convertedType.IsAssignableFrom(typeof(StringOption));
 
     public bool TryConvert(
         object objToConvert,
-        [NotNullWhen(true)] out OptionBehaviour? settingsOption,
-        Transform? parent = null)
+        [NotNullWhen(true)] out StringOption? convertedObj,
+        TransformConvertArgs convertArgs)
     {
         if (objToConvert is not ICustomSettingsOption<string>
             {
                 CustomOption: ICustomStringOption customStringOption
             } ||
-            !SettingsOptionPrototypeManager.Instance.TryCloneAndGet<StringOption>(out var stringOption, parent))
+            !PrototypeManager.Instance.TryCloneAndGet<StringOption>(out var stringOption, convertArgs.Parent))
         {
-            settingsOption = null;
+            convertedObj = null;
             return false;
         }
 
@@ -34,13 +34,7 @@ public class SettingsStringOptionConverter : ISettingsOptionConverter
         stringOption.Value = customStringOption.ValueInt;
         stringOption.Values = customStringOption.ValueNames;
 
-        SettingsOptionConverterHelper.Bind(
-            stringOption,
-            customStringOption,
-            () => customStringOption.ValueInt = stringOption.Value,
-            () => stringOption.Value = customStringOption.ValueInt);
-
-        settingsOption = stringOption;
+        convertedObj = stringOption;
         return true;
     }
 }

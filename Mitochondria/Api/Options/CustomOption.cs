@@ -38,10 +38,10 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
     }
     
     public TValue DefaultValue { get; }
-    
-    public string Id { get; }
 
     public bool HostOnly { get; }
+
+    public string Id { get; }
 
     public event ICustomOption<TValue>.ValueChangedHandler? OnValueChanged;
 
@@ -52,11 +52,13 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
     private const string DefaultFormatString = "{0}";
 
     protected CustomOption(
+        string id,
         string title,
         TValue value,
         string? formatString = null,
         bool sync = true)
     {
+        Id = id;
         Title = title;
         ValueType = typeof(TValue);
         _value = value;
@@ -66,7 +68,6 @@ public abstract class CustomOption<TPlugin, TValue> : ICustomOption<TValue>
         HostOnly = sync;
 
         TitleName = CustomStringName.CreateAndRegister(Title);
-        Id = $"CustomOption_{Title}";
 
         this.SetOwner<TPlugin>();
 

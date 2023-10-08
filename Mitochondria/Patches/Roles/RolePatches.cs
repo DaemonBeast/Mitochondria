@@ -77,7 +77,8 @@ internal static class RolePatches
             var role = player.Data.Role;
             
             if (role == null ||
-                !player.TryGetCustomRoleBehaviour(out _) ||
+                !player.TryGetCustomRoleBehaviour(out var customRoleBehaviour) ||
+                customRoleBehaviour.CustomRole == null ||
                 string.IsNullOrEmpty(role.BlurbMed))
             {
                 return;

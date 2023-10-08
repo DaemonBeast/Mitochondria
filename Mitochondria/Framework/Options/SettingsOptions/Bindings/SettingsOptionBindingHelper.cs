@@ -1,8 +1,8 @@
 ﻿using Mitochondria.Api.Options;
 
-namespace Mitochondria.Framework.Options.SettingsOptions.Converters;
+namespace Mitochondria.Framework.Options.SettingsOptions.Bindings;
 
-public static class SettingsOptionConverterHelper
+public static class SettingsOptionBindingHelper
 {
     public static void Bind(
         OptionBehaviour optionBehaviour,

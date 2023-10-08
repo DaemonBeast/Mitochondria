@@ -21,11 +21,12 @@ public class CustomStringOption<TPlugin, TEnum> : CustomOption<TPlugin, TEnum>, 
     public StringNames[] ValueNames { get; }
 
     public CustomStringOption(
+        string id,
         string title,
         TEnum value,
         IDictionary<TEnum, string>? displayValues = null,
         string? formatString = null,
-        bool sync = true) : base(title, value, formatString, sync)
+        bool sync = true) : base(id, title, value, formatString, sync)
     {
         ValueNames = Enum.GetValues<TEnum>()
             .Select(e => CustomStringName.CreateAndRegister(

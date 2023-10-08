@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AmongUs.GameOptions;
+using Mitochondria.Api.Binding;
 using Mitochondria.Api.Options;
 using Mitochondria.Api.Options.SettingsOptions;
+using Mitochondria.Framework.Binding;
 using Mitochondria.Framework.Configuration;
 using Mitochondria.Framework.Helpers;
 using Mitochondria.Framework.UI.Extensions;
@@ -77,7 +79,7 @@ public class CustomSettingsOptionManager
         }
         else
         {
-            customSettings.Add(customOption.Title, customOption.BoxedValue);
+            customSettings.Add(customOption.Id, customOption.BoxedValue);
         }
 
         config.Save(customSettingsOptionsConfig);
@@ -188,7 +190,7 @@ public class CustomSettingsOptionManager
         var customOption = customSettingsOption.BoxedCustomOption;
         var config = Config.Instance.Of(customSettingsOption.GetOwner()!.Instance.GetType());
         var customSettingsOptionsConfig = config.Load<CustomSettingsOptionsConfig>();
-        customSettingsOptionsConfig.CustomSettings[customOption.Title] = customOption.BoxedValue;
+        customSettingsOptionsConfig.CustomSettings[customOption.Id] = customOption.BoxedValue;
         config.Save(customSettingsOptionsConfig);
     }
 
@@ -199,6 +201,7 @@ public class CustomSettingsOptionManager
             return;
         }
 
+        var convertArgs = new TransformConvertArgs(GameOptionsMenuHelper.Transform);
         var flexContainer = SettingsOptionManager.Instance.FlexContainer;
         
         foreach (var customSettingsOption in customSettingsOptions)
@@ -209,8 +212,11 @@ public class CustomSettingsOptionManager
             {
                 continue;
             }
-            
-            if (!SettingsOptionConverterManager.Instance.TryConvert(customSettingsOption, out var optionBehaviour))
+
+            if (!Converter.Instance.TryConvert<OptionBehaviour, TransformConvertArgs>(
+                    customSettingsOption,
+                    out var optionBehaviour,
+                    convertArgs))
             {
                 Logger<MitochondriaPlugin>.Warning($"Failed to create game object for \"{customOption.Title}\" option");
                 
@@ -219,7 +225,8 @@ public class CustomSettingsOptionManager
 
             gameObject = optionBehaviour.gameObject;
             
-            if (gameObject.AsFlex() is not SettingsOptionFlex flex)
+            if (!Binder.Instance.TryBind(optionBehaviour, customOption) ||
+                gameObject.AsFlex() is not SettingsOptionFlex flex)
             {
                 // Can't have a game object that's not in the flex container or there'll be overlapping issues
                 gameObject.Destroy();
@@ -231,7 +238,7 @@ public class CustomSettingsOptionManager
 
             _settingsOptions[customSettingsOption] = gameObject;
 
-            gameObject.name = customOption.Title;
+            gameObject.name = customOption.Title.RemoveWhitespace();
 
             if (customSettingsOption.Order != null)
             {

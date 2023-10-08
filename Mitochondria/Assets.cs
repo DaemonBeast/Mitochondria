@@ -31,7 +31,7 @@ public static class Assets
 
         public static EmbeddedSpriteProvider WhiteDot { get; }
 
-        public static EmbeddedSpriteProvider Circle { get; }
+        public static EmbeddedSpriteProvider LargeCircle { get; }
 
         public static AssetBundleSpriteProvider RoundedBox { get; }
 
@@ -45,11 +45,21 @@ public static class Assets
 
             BlackDot = new EmbeddedSpriteProvider("BlackDot.png", 1f, true, SourceAssembly);
             WhiteDot = new EmbeddedSpriteProvider("WhiteDot.png", 1f, true, SourceAssembly);
-            Circle = new EmbeddedSpriteProvider("Circle.png", 508f, true, SourceAssembly);
+            LargeCircle = new EmbeddedSpriteProvider("Circle.png", 508f, true, SourceAssembly);
 
             RoundedBox = new AssetBundleSpriteProvider(AssetBundles.Shapes, "RoundedBox");
             BorderedRoundedBox = new AssetBundleSpriteProvider(AssetBundles.Shapes, "BorderedRoundedBox");
             Badge = new AssetBundleSpriteProvider(AssetBundles.Shapes, "Badge");
+        }
+
+        public static class Buttons
+        {
+            public static EmbeddedSpriteProvider Circle { get; }
+
+            static Buttons()
+            {
+                Circle = new EmbeddedSpriteProvider("Circle.png", 1417f, true, SourceAssembly);
+            }
         }
     }
 }

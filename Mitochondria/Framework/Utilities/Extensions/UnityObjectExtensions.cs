@@ -1,4 +1,5 @@
-﻿using Reactor.Utilities;
+﻿using System.Diagnostics.CodeAnalysis;
+using Reactor.Utilities;
 using Object = UnityEngine.Object;
 
 namespace Mitochondria.Framework.Utilities.Extensions;
@@ -32,5 +33,22 @@ public static class UnityObjectExtensions
         where T : Il2CppSystem.Object
     {
         return Il2CppEqualityComparer<T>.Instance.Equals(x, y);
+    }
+
+    public static bool Is<T>(this object obj, [NotNullWhen(true)] out T? castedObj)
+        where T : Il2CppSystem.Object
+    {
+        if (obj is Il2CppSystem.Object il2CppObject)
+        {
+            var cast = il2CppObject.TryCast<T>();
+            if (cast != null)
+            {
+                castedObj = cast;
+                return true;
+            }
+        }
+
+        castedObj = null;
+        return false;
     }
 }

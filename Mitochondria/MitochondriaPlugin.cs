@@ -2,9 +2,9 @@
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
+using Mitochondria.Framework.Binding;
 using Mitochondria.Framework.Options;
 using Mitochondria.Framework.Options.SettingsOptions;
-using Mitochondria.Framework.Options.SettingsOptions.Converters;
 using Mitochondria.Framework.Plugin;
 using Mitochondria.Framework.Roles;
 using Mitochondria.Framework.Services;
@@ -37,7 +37,8 @@ public partial class MitochondriaPlugin : BasePlugin
             
             ServiceAttribute.Register(assembly, pluginInfo);
             CustomRoleAttribute.Register(assembly);
-            SettingsOptionConverterAttribute.Register(assembly);
+            ConverterAttribute.Register(assembly);
+            BindingAttribute.Register(assembly);
         };
 
         IL2CPPChainloader.Instance.PluginLoaded += pluginInfo =>
@@ -55,7 +56,7 @@ public partial class MitochondriaPlugin : BasePlugin
         
         Harmony.PatchAll();
         
-        ShowTooltipsOption = new CustomToggleOption<MitochondriaPlugin>("Show Tooltips", true, false);
+        ShowTooltipsOption = new CustomToggleOption<MitochondriaPlugin>("Show Tooltips", "Show Tooltips", true, false);
     }
 
     public override bool Unload()
