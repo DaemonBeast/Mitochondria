@@ -61,7 +61,7 @@ public class ActionButtonBinding : Binding<ActionButton, CustomActionButton>
 
         Enabled.Equalize(
             Obj.canInteract,
-            Other is { Enabled: true, State.Uses.HasUsesRemaining: true },
+            Other is { Enabled: true, State.Uses.HasUsesRemaining: true } && Other.CanUse(),
             enabled => Enabled = Other.Enabled = enabled,
             enabled =>
             {
@@ -83,6 +83,14 @@ public class ActionButtonBinding : Binding<ActionButton, CustomActionButton>
             {
                 FillState = fillState;
                 Obj.graphic.transform.localPosition = Obj.position;
+
+                if (FillState == FillState.Idle)
+                {
+                    var cooldownTime = Other.State.CooldownTime;
+                    var fill = cooldownTime == 0f ? 0f : Mathf.Clamp(Other.State.FillAmount / cooldownTime, 0f, 1f);
+                    Obj.SetCooldownFill(fill);
+                    Obj.cooldownTimerText.gameObject.SetActive(false);
+                }
             });
 
         switch (Other.State.FillState)
@@ -97,15 +105,6 @@ public class ActionButtonBinding : Binding<ActionButton, CustomActionButton>
             case FillState.Cooling:
             {
                 Obj.SetCoolDown(Other.State.FillAmount, Other.State.CooldownTime);
-                break;
-            }
-            case FillState.Idle:
-            {
-                var cooldownTime = Other.State.CooldownTime;
-                var fill = cooldownTime == 0f ? 0f : Mathf.Clamp(Other.State.FillAmount / cooldownTime, 0f, 1f);
-                Obj.SetCooldownFill(fill);
-                Obj.cooldownTimerText.gameObject.SetActive(false);
-
                 break;
             }
         }

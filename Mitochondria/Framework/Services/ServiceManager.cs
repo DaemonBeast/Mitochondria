@@ -1,11 +1,10 @@
 ﻿using System.Collections.Immutable;
 using System.Reflection;
 using BepInEx;
-using Il2CppInterop.Generator.Extensions;
+using HarmonyLib;
 using Mitochondria.Api.Services;
 using Mitochondria.Framework.Utilities;
 using Mitochondria.Framework.Utilities.Extensions;
-using Reactor.Utilities;
 
 namespace Mitochondria.Framework.Services;
 
@@ -16,12 +15,10 @@ public class ServiceManager
     public IReadOnlyDictionary<Type, IService> Services => _services.ToImmutableDictionary();
 
     private readonly Dictionary<Type, IService> _services;
-    private readonly Dictionary<string, List<Action<object?[]?>>> _serviceMethods;
 
     private ServiceManager()
     {
         _services = new Dictionary<Type, IService>();
-        _serviceMethods = new Dictionary<string, List<Action<object?[]?>>>();
     }
 
     public void Register(Type serviceType, PluginInfo pluginInfo)
@@ -43,37 +40,20 @@ public class ServiceManager
 
         foreach (var method in methods)
         {
-            _serviceMethods
-                .GetOrCreate(method.Name[(method.Name.LastIndexOf('.') + 1)..], _ => new List<Action<object?[]?>>())
-                .Add(args => method.Invoke(service, args));
-        }
-    }
+            var methodName = method.Name[(method.Name.LastIndexOf('.') + 1)..];
+            var actionType = method.GetParameters().Types().ToActionType();
+            var action = method.CreateDelegate(actionType, service);
 
-    internal bool TryInvokeMethod(string methodName, params object?[]? args)
-    {
-        if (!_serviceMethods.TryGetValue(methodName, out var actions))
-        {
-            // ignore unknown method names
-            return true;
-        }
+            var actionManager = typeof(AbstractActionManager<>)
+                .MakeGenericType(actionType)
+                .GetProperty(
+                    nameof(AbstractActionManager<Delegate>.ActionManager), BindingFlags.Public | BindingFlags.Static)
+                !.GetValue(null)!;
 
-        foreach (var action in actions)
-        {
-            try
-            {
-                action.Invoke(args);
-            }
-            catch (MemberAccessException)
-            {
-                // (probably) invalid args
-                return false;
-            }
-            catch (Exception e)
-            {
-                Logger<MitochondriaPlugin>.Error($"An exception was thrown by a service: {e}");
-            }
+            actionManager
+                .GetType()
+                .GetMethod(nameof(AbstractActionManager<Delegate>.TryAddBoxed))
+                !.Invoke(actionManager, new object?[] { methodName, action });
         }
-
-        return true;
     }
 }

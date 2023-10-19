@@ -45,4 +45,29 @@ public static class EnumerableExtensions
             }
         }
     }
+
+    public static bool IsOrdered<T>(this IEnumerable<T> enumerable, IComparer<T>? comparer = null)
+    {
+        var actualComparer = comparer ?? Comparer<T>.Default;
+
+        using var enumerator = enumerable.GetEnumerator();
+        if (!enumerator.MoveNext())
+        {
+            // It's just empty
+            return true;
+        }
+
+        var previous = enumerator.Current;
+        while (enumerator.MoveNext())
+        {
+            if (actualComparer.Compare(enumerator.Current, previous) < 0)
+            {
+                return false;
+            }
+
+            previous = enumerator.Current;
+        }
+
+        return true;
+    }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Il2CppInterop.Runtime;
 
 namespace Mitochondria.Framework.Utilities.Extensions;
 
@@ -60,5 +59,36 @@ public static class TypeExtensions
                 yield return typeInterface;
             }
         }
+    }
+
+    public static Type ToActionType(this Type[] types)
+    {
+        if (types.Length == 0)
+        {
+            return typeof(Action);
+        }
+
+        return (types.Length switch
+        {
+            1 => typeof(Action<>),
+            2 => typeof(Action<,>),
+            3 => typeof(Action<,,>),
+            4 => typeof(Action<,,,>),
+            5 => typeof(Action<,,,,>),
+            6 => typeof(Action<,,,,,>),
+            7 => typeof(Action<,,,,,,>),
+            8 => typeof(Action<,,,,,,,>),
+            9 => typeof(Action<,,,,,,,,>),
+            10 => typeof(Action<,,,,,,,,,>),
+            11 => typeof(Action<,,,,,,,,,,>),
+            12 => typeof(Action<,,,,,,,,,,,>),
+            13 => typeof(Action<,,,,,,,,,,,,>),
+            14 => typeof(Action<,,,,,,,,,,,,,>),
+            15 => typeof(Action<,,,,,,,,,,,,,,>),
+            16 => typeof(Action<,,,,,,,,,,,,,,,>),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(types),
+                "Cannot create action type with more than 16 types")
+        }).MakeGenericType(types);
     }
 }

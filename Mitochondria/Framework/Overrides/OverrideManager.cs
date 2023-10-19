@@ -11,6 +11,7 @@ public class OverrideManager
     public static OverrideManager Instance => Singleton<OverrideManager>.Instance;
 
     public ImmutableDictionary<Type, ImmutableList<IOverride>> Overrides => _overrides.ToImmutableDictionary();
+
     public ImmutableDictionary<Type, IOverride> MergedOverrides => _mergedOverrides.ToImmutableDictionary();
 
     private readonly Dictionary<Type, ImmutableList<IOverride>> _overrides;

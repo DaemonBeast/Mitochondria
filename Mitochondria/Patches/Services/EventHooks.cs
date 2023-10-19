@@ -14,25 +14,25 @@ public class EventHooks : MonoBehaviour
     {
         SceneManager.add_sceneLoaded((Action<Scene, LoadSceneMode>) ((scene, loadMode) =>
         {
-            ServiceManager.Instance.TryInvokeMethod(nameof(IService.OnSceneLoaded), scene, loadMode);
+            ActionManager<Scene, LoadSceneMode>.Instance.Invoke(nameof(IService.OnSceneLoaded), scene, loadMode);
         }));
     }
 
     private void Start()
-        => ServiceManager.Instance.TryInvokeMethod(nameof(IService.OnStart));
+        => ActionManager.Instance.Invoke(nameof(IService.OnStart));
 
     private void Update()
-        => ServiceManager.Instance.TryInvokeMethod(nameof(IService.OnUpdate));
+        => ActionManager.Instance.Invoke(nameof(IService.OnUpdate));
 
     private void OnApplicationQuit()
-        => ServiceManager.Instance.TryInvokeMethod(nameof(IService.OnGracefulExit));
+        => ActionManager.Instance.Invoke(nameof(IService.OnGracefulExit));
 
-    [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameJoined))]
+    [HarmonyPatch(typeof(LobbyBehaviour), nameof(LobbyBehaviour.Start))]
     public static class GameJoinedPatch
     {
         public static void Postfix()
         {
-            ServiceManager.Instance.TryInvokeMethod(nameof(IService.OnLobbyJoined));
+            ActionManager.Instance.Invoke(nameof(IService.OnLobbyJoined));
         }
     }
 
@@ -41,7 +41,7 @@ public class EventHooks : MonoBehaviour
     {
         public static void Postfix(HudManager __instance)
         {
-            ServiceManager.Instance.TryInvokeMethod(nameof(IService.OnHudStart), __instance);
+            ActionManager<HudManager>.Instance.Invoke(nameof(IService.OnHudStart), __instance);
         }
     }
 }

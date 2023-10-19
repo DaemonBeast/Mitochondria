@@ -35,7 +35,7 @@ public class RpcSync : PlayerCustomRpc<MitochondriaPlugin, RpcSync.Data>
         
         if (!SyncableManager.Instance.TryGet(syncableId, out var syncable))
         {
-            Logger<MitochondriaPlugin>.Error($"Received Sync RPC for unknown Syncable {syncableId}");
+            Logger<MitochondriaPlugin>.Warning($"Received Sync RPC for unknown Syncable {syncableId}");
             
             return new Data(null);
         }

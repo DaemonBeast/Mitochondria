@@ -1,10 +1,8 @@
-﻿using AmongUs.GameOptions;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Mitochondria.Framework.Binding;
 using Mitochondria.Framework.Options;
-using Mitochondria.Framework.Options.SettingsOptions;
 using Mitochondria.Framework.Plugin;
 using Mitochondria.Framework.Roles;
 using Mitochondria.Framework.Services;
@@ -12,6 +10,7 @@ using Mitochondria.Framework.Services.Extensions;
 using Mitochondria.Framework.Utilities.Extensions;
 using Mitochondria.Patches.Services;
 using Reactor;
+using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 
 namespace Mitochondria;
@@ -23,8 +22,8 @@ public partial class MitochondriaPlugin : BasePlugin
 {
     public Harmony Harmony { get; } = new(Id);
 
-    [CustomSettingsOption(order: 11)]
-    [CustomSettingsOption(GameModes.HideNSeek, 11)]
+    // [CustomSettingsOption(order: 11)]
+    // [CustomSettingsOption(GameModes.HideNSeek, 11)]
     public static CustomToggleOption<MitochondriaPlugin> ShowTooltipsOption { get; private set; } = null!;
 
     private EventHooks? _eventHooks;
@@ -33,6 +32,16 @@ public partial class MitochondriaPlugin : BasePlugin
     {
         IL2CPPChainloader.Instance.PluginLoad += (pluginInfo, assembly, basePlugin) =>
         {
+            if (PluginManager.Instance.PluginInfos.Values
+                .Select(p => p.Instance?.GetType()?.Assembly)
+                .Any(a => a == assembly))
+            {
+                Logger<MitochondriaPlugin>.Error(
+                    $"Multiple plugins in the same assembly is not supported. {pluginInfo.TypeName} may not work properly");
+
+                return;
+            }
+
             PluginManager.Instance.Add(basePlugin.GetType(), pluginInfo);
             
             ServiceAttribute.Register(assembly, pluginInfo);

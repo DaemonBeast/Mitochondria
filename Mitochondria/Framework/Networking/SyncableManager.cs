@@ -11,36 +11,47 @@ namespace Mitochondria.Framework.Networking;
 public class SyncableManager
 {
     public static SyncableManager Instance => Singleton<SyncableManager>.Instance;
-    
-    public Dictionary<ulong, ISyncable> Syncables { get; }
+
+    public Dictionary<ulong, WeakReference<ISyncable>> Syncables { get; }
 
     public SyncableManager()
     {
-        Syncables = new Dictionary<ulong, ISyncable>();
+        Syncables = new Dictionary<ulong, WeakReference<ISyncable>>();
     }
 
     public void Add(ISyncable syncable)
     {
         var syncableId = syncable.Id.Get64HashCode().ToUInt64();
-        if (Syncables.ContainsKey(syncableId))
+        if (Syncables.TryGetValue(syncableId, out var syncableRef) && syncableRef.TryGetTarget(out _))
         {
-            Logger<MitochondriaPlugin>.Error($"Attempted to add multiple Syncables with the same ID: {syncable.Id}");
-
-            return;
+            Logger<MitochondriaPlugin>.Warning($"Overriding Syncable with the same ID: {syncable.Id}");
         }
 
-        Syncables.Add(syncableId, syncable);
+        Syncables[syncableId] = new WeakReference<ISyncable>(syncable);
     }
 
     public bool TryGet(ulong id, [NotNullWhen(true)] out ISyncable? syncable)
-        => Syncables.TryGetValue(id, out syncable);
+    {
+        if (Syncables.TryGetValue(id, out var syncableRef))
+        {
+            if (syncableRef.TryGetTarget(out syncable))
+            {
+                return true;
+            }
+
+            Syncables.Remove(id);
+        }
+
+        syncable = null;
+        return false;
+    }
 
     public void Remove(ulong id)
         => Syncables.Remove(id);
 
     public void Sync(ISyncable syncable)
     {
-        if (!Syncables.ContainsValue(syncable))
+        if (!Syncables.Values.Any(r => r.TryGetTarget(out var s) && s == syncable))
         {
             Logger<MitochondriaPlugin>.Error("Attempted to sync Syncable not added to SyncableManager");
 
@@ -58,9 +69,12 @@ public class SyncableManager
 
     public void SyncAll()
     {
-        foreach (var syncable in Syncables.Values)
+        foreach (var syncableRef in Syncables.Values)
         {
-            Sync(syncable);
+            if (syncableRef.TryGetTarget(out var syncable))
+            {
+                Sync(syncable);
+            }
         }
     }
 }

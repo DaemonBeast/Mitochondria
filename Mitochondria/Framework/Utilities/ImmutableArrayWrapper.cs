@@ -1,8 +1,8 @@
 ﻿using System.Collections.Immutable;
 
-namespace Mitochondria.Framework.Utilities.Extensions;
+namespace Mitochondria.Framework.Utilities;
 
-public class ImmutableArrayWrapper<T>
+public class ImmutableArrayWrapper<T> : ImmutableArrayWrapper
 {
     public ImmutableArray<T> Immutable
     {
@@ -18,14 +18,14 @@ public class ImmutableArrayWrapper<T>
         }
     }
 
-    public List<T> Actual { get; }
+    public ICollection<T> Actual { get; }
 
     private ImmutableArray<T> _immutableArray;
     private bool _isDirty;
 
-    public ImmutableArrayWrapper(IEnumerable<T>? original = null)
+    public ImmutableArrayWrapper(ICollection<T>? actual = null)
     {
-        Actual = original?.ToList() ?? new List<T>();
+        Actual = actual ?? new List<T>();
 
         _immutableArray = ImmutableArray<T>.Empty;
         _isDirty = true;
@@ -48,4 +48,8 @@ public class ImmutableArrayWrapper<T>
     {
         _isDirty = true;
     }
+}
+
+public class ImmutableArrayWrapper
+{
 }

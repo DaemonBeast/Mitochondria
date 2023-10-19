@@ -61,7 +61,7 @@ public class CustomSettingsOptionManager
         }
         else
         {
-            customSettingsOptions = new List<ICustomSettingsOption>() { customSettingsOption };
+            customSettingsOptions = new List<ICustomSettingsOption>();
             _customSettingsOptions.Add(customSettingsOption.GameMode, customSettingsOptions);
         }
         
@@ -73,7 +73,7 @@ public class CustomSettingsOptionManager
         var customSettingsOptionsConfig = config.Load<CustomSettingsOptionsConfig>();
         var customSettings = customSettingsOptionsConfig.CustomSettings;
 
-        if (customSettings.TryGetValue(customOption.Title, out var value))
+        if (customSettings.TryGetValue(customOption.Id, out var value))
         {
             customOption.BoxedValue = value;
         }
@@ -84,13 +84,23 @@ public class CustomSettingsOptionManager
 
         config.Save(customSettingsOptionsConfig);
 
-        if (GameOptionsManager.Instance?.currentGameMode == customSettingsOption.GameMode)
+        if (GameOptionsMenuHelper.Current != null &&
+            GameOptionsManager.Instance != null &&
+            GameOptionsManager.Instance.currentGameMode == customSettingsOption.GameMode)
         {
             TryCreateSettingsOptions(customSettingsOption.GameMode);
         }
     }
 
-    public void Remove(ICustomSettingsOption customSettingsOption)
+    public void RemoveRange(IEnumerable<ICustomSettingsOption> customSettingsOptions, bool removeFromConfig = true)
+    {
+        foreach (var customSettingsOption in customSettingsOptions)
+        {
+            Remove(customSettingsOption, removeFromConfig);
+        }
+    }
+
+    public void Remove(ICustomSettingsOption customSettingsOption, bool removeFromConfig = true)
     {
         var customSettingsOptions = _customSettingsOptions.GetValueOrDefault(customSettingsOption.GameMode);
         if (customSettingsOptions == null || !customSettingsOptions.Remove(customSettingsOption))
@@ -99,25 +109,26 @@ public class CustomSettingsOptionManager
         }
 
         customSettingsOption.OnChanged -= CustomSettingsOptionChanged;
-        
-        if (GameOptionsManager.Instance?.currentGameMode != customSettingsOption.GameMode ||
+
+        // why did I include this???
+        /*if (GameOptionsManager.Instance?.currentGameMode != customSettingsOption.GameMode ||
             !_settingsOptions.ContainsKey(customSettingsOption))
         {
             return;
+        }*/
+
+        if (removeFromConfig)
+        {
+            var config = Config.Instance.Of(customSettingsOption.GetOwner()!.Instance.GetType());
+            var customSettingsOptionsConfig = config.Load<CustomSettingsOptionsConfig>();
+            customSettingsOptionsConfig.CustomSettings.Remove(customSettingsOption.BoxedCustomOption.Id);
+            config.Save(customSettingsOptionsConfig);
         }
 
-        var config = Config.Instance.Of(customSettingsOption.GetOwner()!.Instance.GetType());
-        var customSettingsOptionsConfig = config.Load<CustomSettingsOptionsConfig>();
-        customSettingsOptionsConfig.CustomSettings.Remove(customSettingsOption.BoxedCustomOption.Title);
-        config.Save(customSettingsOptionsConfig);
-
-        var gameObject = _settingsOptions[customSettingsOption];
-        if (gameObject != null)
+        if (_settingsOptions.Remove(customSettingsOption, out var gameObject) && gameObject != null)
         {
             gameObject.Destroy();
         }
-
-        _settingsOptions.Remove(customSettingsOption);
     }
 
     public IEnumerable<ICustomSettingsOption> Find(ICustomOption customOption)
