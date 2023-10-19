@@ -16,12 +16,20 @@
 
         <Title>Mitochondria</Title>
         <PackageId>AmongUs.Astral.Mitochondria</PackageId>
+        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/DaemonBeast/Mitochondria</RepositoryUrl>
         <Authors>Daemon</Authors>
         <Company>Astral</Company>
 
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Reactor" Version="2.2.0" ExcludeAssets="runtime" />
