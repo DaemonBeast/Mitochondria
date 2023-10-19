@@ -15,7 +15,7 @@ using Reactor.Utilities.Extensions;
 
 namespace Mitochondria;
 
-[BepInAutoPlugin("au.astral.mitochondria")]
+[BepInAutoPlugin("astral.mitochondria")]
 [BepInProcess("Among Us.exe")]
 [BepInDependency(ReactorPlugin.Id)]
 public partial class MitochondriaPlugin : BasePlugin
