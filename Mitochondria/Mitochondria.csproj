@@ -15,7 +15,7 @@
         <Description>API for Among Us mods</Description>
 
         <Title>Mitochondria</Title>
-        <PackageId>astral.mitochondria</PackageId>
+        <PackageId>AmongUs.Astral.Mitochondria</PackageId>
         <Authors>Daemon</Authors>
         <Company>Astral</Company>
 
