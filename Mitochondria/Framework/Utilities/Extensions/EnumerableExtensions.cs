@@ -1,4 +1,6 @@
-﻿namespace Mitochondria.Framework.Utilities.Extensions;
+﻿using I = Il2CppSystem.Collections.Generic;
+
+namespace Mitochondria.Framework.Utilities.Extensions;
 
 public static class EnumerableExtensions
 {
@@ -69,5 +71,16 @@ public static class EnumerableExtensions
         }
 
         return true;
+    }
+
+    public static I.List<T> ToIl2CppList<T>(this IEnumerable<T> enumerable)
+    {
+        var list = new I.List<T>();
+        foreach (var item in enumerable)
+        {
+            list.Add(item);
+        }
+
+        return list;
     }
 }

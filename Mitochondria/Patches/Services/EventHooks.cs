@@ -24,6 +24,9 @@ public class EventHooks : MonoBehaviour
     private void Update()
         => ActionManager.Instance.Invoke(nameof(IService.OnUpdate));
 
+    private void LateUpdate()
+        => ActionManager.Instance.Invoke(nameof(IService.OnLateUpdate));
+
     private void OnApplicationQuit()
         => ActionManager.Instance.Invoke(nameof(IService.OnGracefulExit));
 

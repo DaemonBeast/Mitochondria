@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Mitochondria.Api.Storage;
+﻿using Mitochondria.Api.Storage;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -12,7 +11,7 @@ public class YamlStorage : IStorage
     private readonly ISerializer _serializer;
     private readonly IDeserializer _deserializer;
 
-    private readonly ConditionalWeakTable<string, object> _cache;
+    private readonly Dictionary<string, object> _cache;
 
     public YamlStorage(YamlStorageConfiguration storageConfiguration)
     {
@@ -27,13 +26,13 @@ public class YamlStorage : IStorage
             .WithNamingConvention(PascalCaseNamingConvention.Instance)
             .Build();
 
-        _cache = new ConditionalWeakTable<string, object>();
+        _cache = new Dictionary<string, object>();
     }
 
     public void Save(string fileName, object obj)
     {
         var savePath = StorageConfiguration.GetAbsoluteSavePath(fileName);
-        _cache.AddOrUpdate(savePath, obj);
+        _cache[savePath] = obj;
         
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
 
@@ -41,10 +40,11 @@ public class YamlStorage : IStorage
         _serializer.Serialize(streamWriter, obj);
     }
 
-    public T Load<T>(string fileName, IEnumerable<string>? altFileNames = null)
+    public T Load<T>(string fileName, IEnumerable<string>? altFileNames = null, bool useCached = true)
         where T : class
     {
-        if (_cache.TryGetValue(
+        if (useCached &&
+            _cache.TryGetValue(
                 StorageConfiguration.GetAbsoluteSavePath(fileName),
                 out var cachedObj) &&
             cachedObj is T typedObj)

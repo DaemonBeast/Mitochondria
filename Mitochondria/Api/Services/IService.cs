@@ -22,6 +22,10 @@ public interface IService : IOwned
     {
     }
 
+    protected internal void OnLateUpdate()
+    {
+    }
+
     protected internal void OnGracefulExit()
     {
     }

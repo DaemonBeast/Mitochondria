@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
+using Mitochondria.Framework.Utilities.Extensions;
+using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
 
@@ -37,6 +40,28 @@ public class EmbeddedAssetBundleProvider : AssetBundleProvider
         _bundle = AssetBundle.LoadFromStream(assetBundleStream.AsIl2Cpp());
 
         return _bundle;
+    }
+
+    public IEnumerator CoLoad(bool skipIfCached = true, Action<AssetBundle>? onCompleted = null)
+    {
+        if (skipIfCached && _bundle != null)
+        {
+            yield break;
+        }
+
+        var assetBundleBytes = SourceAssembly.GetManifestResourceStream(Name)!.AsBytes();
+        var request = AssetBundle.LoadFromMemoryAsync(assetBundleBytes);
+
+        request.add_completed((Action<AsyncOperation>) (_ =>
+        {
+            _bundle = request.assetBundle;
+            onCompleted?.Invoke(_bundle);
+        }));
+    }
+
+    public void Preload()
+    {
+        Coroutines.Start(CoLoad());
     }
 
     public override int GetHashCode()
