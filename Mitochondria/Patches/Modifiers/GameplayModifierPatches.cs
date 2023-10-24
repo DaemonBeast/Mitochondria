@@ -98,10 +98,10 @@ public static class GameplayModifierPatches
         }
     }
 
-    [HarmonyPatch(typeof(HudManager._CoShowIntro_d__86), nameof(HudManager._CoShowIntro_d__86.MoveNext))]
+    [HarmonyPatch(typeof(HudManager._CoShowIntro_d__87), nameof(HudManager._CoShowIntro_d__87.MoveNext))]
     public static class IntroCutsceneEndingHookPatch
     {
-        public static void Prefix(HudManager._CoShowIntro_d__86 __instance)
+        public static void Prefix(HudManager._CoShowIntro_d__87 __instance)
         {
             if (__instance.__1__state == 4)
             {
