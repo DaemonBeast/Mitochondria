@@ -13,6 +13,8 @@ public abstract class CustomActionButton : ICustomActionButton
 
     public string? Description { get; }
 
+    public TextStyle TitleStyle { get; set; }
+
     public bool Visible { get; set; }
     
     public bool Enabled { get; set; }
@@ -25,6 +27,7 @@ public abstract class CustomActionButton : ICustomActionButton
         string title,
         SpriteProvider icon,
         string? description = null,
+        TextStyle? titleStyle = null,
         int cooldownTime = 0,
         int maxUseTime = 0,
         int? uses = null)
@@ -32,6 +35,7 @@ public abstract class CustomActionButton : ICustomActionButton
         Title = title;
         Icon = icon;
         Description = description;
+        TitleStyle = titleStyle ?? TextStyle.Normal;
 
         Visible = true;
         Enabled = true;

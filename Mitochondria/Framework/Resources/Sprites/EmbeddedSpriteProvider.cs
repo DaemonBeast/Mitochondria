@@ -29,7 +29,7 @@ public class EmbeddedSpriteProvider : SpriteProvider
         var assembly = sourceAssembly ?? Assembly.GetCallingAssembly();
 
         SourceAssembly = assembly;
-        Name = EmbeddedResourceHelper.TryGetMatchingFullName(assembly, name, searchRecursively);
+        Name = EmbeddedResourceHelper.TryGetMatchingName(assembly, name, searchRecursively);
         Ppi = ppi;
     }
 

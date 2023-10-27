@@ -26,8 +26,11 @@ public class CustomSettingsOptionService : IService
             .Where(o => o != null)
             .SelectMany(o => o.GetType().Assembly.GetTypes())
             .SelectMany(t => t
-                .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-                .Concat<MemberInfo>(t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)))
+                .GetProperties(
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
+                .Concat<MemberInfo>(
+                    t.GetFields(
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)))
             .Where(p => p.GetCustomAttributes<CustomSettingsOptionAttribute>().Any());
 
         foreach (var member in  members)

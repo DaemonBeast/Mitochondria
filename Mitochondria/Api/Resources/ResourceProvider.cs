@@ -1,9 +1,23 @@
-﻿namespace Mitochondria.Api.Resources;
+﻿using System.Collections;
+using Reactor.Utilities;
+
+namespace Mitochondria.Api.Resources;
 
 public abstract class ResourceProvider<T> : IResourceProvider<T>
     where T : class
 {
     public abstract T Load(bool useCached = true);
+
+    public virtual IEnumerator CoLoad(bool skipIfCached = true, Action<T>? onCompleted = null)
+    {
+        onCompleted?.Invoke(Load(skipIfCached));
+        yield break;
+    }
+
+    public void Preload()
+    {
+        Coroutines.Start(CoLoad());
+    }
 
     public object LoadBoxed(bool useCached = true)
     {
@@ -21,6 +35,8 @@ public interface IResourceProvider<out T> : IResourceProvider
     where T : class
 {
     public T Load(bool useCached = true);
+
+    public IEnumerator CoLoad(bool skipIfCached = true, Action<T>? onCompleted = null);
 }
 
 public interface IResourceProvider

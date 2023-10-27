@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Mitochondria.Framework.Prototypes;
+using Mitochondria.Framework.Resources.Cache;
 
 namespace Mitochondria.Patches.UI.Hud.Buttons;
 
@@ -19,6 +20,10 @@ public static class ActionButtonPatches
             PrototypeManager.Instance.CloneAndSet(__instance.ReportButton);
             PrototypeManager.Instance.CloneAndSet(__instance.SabotageButton);
             PrototypeManager.Instance.CloneAndSet(__instance.UseButton);
+
+            MaterialCache.Instance.Set(
+                MaterialCacheIds.RedAndWhiteText,
+                __instance.KillButton.buttonLabelText.fontSharedMaterial);
         }
     }
 

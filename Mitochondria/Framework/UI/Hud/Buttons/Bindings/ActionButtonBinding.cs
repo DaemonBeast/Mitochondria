@@ -12,6 +12,8 @@ public class ActionButtonBinding : Binding<ActionButton, CustomActionButton>
 {
     private static readonly int Percent = Shader.PropertyToID("_Percent");
 
+    public TextStyle TitleStyle { get; private set; }
+
     public bool Visible { get; private set; }
 
     public bool Enabled { get; private set; }
@@ -22,9 +24,18 @@ public class ActionButtonBinding : Binding<ActionButton, CustomActionButton>
 
     public int? UsesRemaining { get; private set; }
 
+    private ActionButtonBinding()
+    {
+        TitleStyle = TextStyle.Normal;
+        Visible = true;
+        FillState = FillState.Idle;
+        IsUnlimitedUses = false;
+        UsesRemaining = null;
+    }
+
     public override void Init()
     {
-        Enabled = Other.Enabled;
+        Enabled = Obj.canInteract;
     }
 
     public override void BindEvents()
@@ -43,6 +54,15 @@ public class ActionButtonBinding : Binding<ActionButton, CustomActionButton>
 
     public override void Update()
     {
+        TitleStyle.Equalize(
+            Other.TitleStyle,
+            titleStyle =>
+            {
+                TitleStyle = titleStyle;
+
+                Obj.buttonLabelText.fontMaterial = titleStyle.Material;
+            });
+
         Visible.Equalize(
             Other.Visible && Other.CouldUse(),
             visible =>

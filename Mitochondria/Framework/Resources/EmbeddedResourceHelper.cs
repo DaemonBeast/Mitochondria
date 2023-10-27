@@ -4,13 +4,16 @@ namespace Mitochondria.Framework.Resources;
 
 public static class EmbeddedResourceHelper
 {
-    public static string TryGetMatchingFullName(
+    public static string TryGetMatchingName(
         Assembly sourceAssembly,
         string pathToMatch,
         bool searchRecursively = true)
     {
-        var numMatches =
-            GetMatchingFullNames(sourceAssembly, pathToMatch, searchRecursively, out var matchingResourceNames);
+        var numMatches = GetMatchingPaths(
+            sourceAssembly,
+            pathToMatch,
+            searchRecursively,
+            out var matchingResourceNames);
 
         return numMatches switch
         {
@@ -22,11 +25,12 @@ public static class EmbeddedResourceHelper
         };
     }
 
-    public static int GetMatchingFullNames(
+    public static int GetMatchingPaths(
         Assembly sourceAssembly,
         string pathToMatch,
         bool searchRecursively,
-        out string[] matchingResourceNames)
+        out string[] matchingResourceNames,
+        bool endsWithPath = true)
     {
         var resourceNames = sourceAssembly.GetManifestResourceNames();
         
@@ -39,9 +43,13 @@ public static class EmbeddedResourceHelper
             return 1;
         }
 
+        Func<string, bool> matches = endsWithPath
+            ? name => name.EndsWith(stringToMatch)
+            : name => name.Contains(stringToMatch);
+
         if (searchRecursively)
         {
-            matchingResourceNames = resourceNames.Where(n => n.EndsWith(stringToMatch)).ToArray();
+            matchingResourceNames = resourceNames.Where(n => matches(n)).ToArray();
             return matchingResourceNames.Length;
         }
         

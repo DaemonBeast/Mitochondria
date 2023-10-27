@@ -20,6 +20,8 @@ public class ImmutableArrayWrapper<T> : ImmutableArrayWrapper
 
     public ICollection<T> Actual { get; }
 
+    public int Length => Immutable.Length;
+
     private ImmutableArray<T> _immutableArray;
     private bool _isDirty;
 

@@ -26,7 +26,7 @@ public class EmbeddedAssetBundleProvider : AssetBundleProvider
         var assembly = sourceAssembly ?? Assembly.GetCallingAssembly();
 
         SourceAssembly = assembly;
-        Name = EmbeddedResourceHelper.TryGetMatchingFullName(assembly, name, searchRecursively);
+        Name = EmbeddedResourceHelper.TryGetMatchingName(assembly, name, searchRecursively);
     }
 
     public override AssetBundle Load(bool useCached = true)
@@ -42,7 +42,7 @@ public class EmbeddedAssetBundleProvider : AssetBundleProvider
         return _bundle;
     }
 
-    public IEnumerator CoLoad(bool skipIfCached = true, Action<AssetBundle>? onCompleted = null)
+    public override IEnumerator CoLoad(bool skipIfCached = true, Action<AssetBundle>? onCompleted = null)
     {
         if (skipIfCached && _bundle != null)
         {
@@ -57,11 +57,6 @@ public class EmbeddedAssetBundleProvider : AssetBundleProvider
             _bundle = request.assetBundle;
             onCompleted?.Invoke(_bundle);
         }));
-    }
-
-    public void Preload()
-    {
-        Coroutines.Start(CoLoad());
     }
 
     public override int GetHashCode()

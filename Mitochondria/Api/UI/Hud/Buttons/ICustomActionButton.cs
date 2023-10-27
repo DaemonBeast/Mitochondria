@@ -10,6 +10,8 @@ public interface ICustomActionButton : IHudElement
 
     public string? Description { get; }
 
+    public TextStyle TitleStyle { get; set; }
+
     public bool Visible { get; set; }
 
     public bool Enabled { get; set; }
