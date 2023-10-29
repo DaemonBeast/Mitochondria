@@ -31,9 +31,9 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: Mitochondria
-          path: Mitochondria/bin/Release/net6.0/*.dll
+          path: Mitochondria.Core/bin/Release/net6.0/*.dll
 
       - uses: actions/upload-artifact@v3
         with:
           name: Mitochondria.nupkg
-          path: Mitochondria/bin/Release/*.nupkg
+          path: Mitochondria.Core/bin/Release/*.nupkg
