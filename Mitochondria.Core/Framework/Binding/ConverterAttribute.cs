@@ -11,6 +11,6 @@ public class ConverterAttribute : Attribute
     {
         TypeUtils.RegisterAttribute<ConverterAttribute, IConverter>(
             assembly,
-            type => Converter.Instance.Register(type));
+            type => ConverterManager.Instance.Register(type));
     }
 }

@@ -1,5 +1,7 @@
 ﻿namespace Mitochondria.Core.Framework.Utilities.Extensions;
 
+// TODO: reorganise extensions
+
 public static class BindingExtensions
 {
     public static void Equalize<T>(this T controlValue, T valueToCompare, Action<T> valueChanged)

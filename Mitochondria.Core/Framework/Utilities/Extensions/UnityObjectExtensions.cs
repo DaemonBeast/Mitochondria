@@ -6,6 +6,12 @@ namespace Mitochondria.Core.Framework.Utilities.Extensions;
 
 public static class UnityObjectExtensions
 {
+    public static T? AsNullable<T>(this T? obj)
+        where T : Object
+    {
+        return obj == null ? null : obj;
+    }
+
     public static TResult? ThenIfNotNull<T, TResult>(this T? obj, Func<T, TResult?> callback)
         where T : Object
         where TResult : class

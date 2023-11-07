@@ -1,4 +1,4 @@
-﻿using BepInEx;
+﻿/*using BepInEx;
 using Mitochondria.Core.Api.Services;
 using Mitochondria.Core.Api.UI.Flex;
 using Mitochondria.Core.Framework.Helpers;
@@ -23,12 +23,12 @@ public class SettingsOptionService : IService
     {
         FlexGameObjectManager.Instance.DefineFlex<OptionBehaviour>(
             CreateSettingsOptionFlex,
-            Constants.Scenes.InGame,
+            Framework.Utilities.Constants.Scenes.InGame,
             "Game Settings");
         
         FlexGameObjectManager.Instance.DefineFlex<OptionBehaviour>(
             CreateSettingsOptionFlex,
-            Constants.Scenes.InGame,
+            Framework.Utilities.Constants.Scenes.InGame,
             "HideNSeekOptionsMenu");
 
         GameOptionsMenuHelper.OnBeforeOpened += () => _orderCounter = 0;
@@ -41,4 +41,4 @@ public class SettingsOptionService : IService
 
         return flex;
     }
-}
+}*/

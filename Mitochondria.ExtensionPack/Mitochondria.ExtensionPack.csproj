@@ -44,6 +44,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Mitochondria.Core\Mitochondria.Core.csproj" />
+      <ProjectReference Include="..\Mitochondria.Options.Settings\Mitochondria.Options.Settings.csproj" />
     </ItemGroup>
 
     <Target Name="Copy" AfterTargets="Build" Condition="'$(AmongUs)' != ''">

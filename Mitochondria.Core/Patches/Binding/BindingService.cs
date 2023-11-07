@@ -9,13 +9,13 @@ public class BindingService : IService
 {
     public void OnUpdate()
     {
-        var bindings = Binder.Instance.Bindings;
+        var bindings = BindingManager.Instance.Bindings;
 
         foreach (var binding in bindings)
         {
             if (binding.IsInvalid())
             {
-                Binder.Instance.Remove(binding);
+                BindingManager.Instance.Remove(binding);
                 continue;
             }
 

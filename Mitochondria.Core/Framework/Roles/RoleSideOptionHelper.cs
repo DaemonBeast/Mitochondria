@@ -2,8 +2,6 @@
 using BepInEx.Unity.IL2CPP;
 using Mitochondria.Core.Api.Roles;
 using Mitochondria.Core.Framework.Options;
-using Mitochondria.Core.Framework.Options.SettingsOptions;
-using Mitochondria.Core.Framework.Options.SettingsOptions.Managers;
 
 namespace Mitochondria.Core.Framework.Roles;
 
@@ -21,7 +19,7 @@ public static class RoleSideOptionHelper
             new FloatRange(0, maxAmount));
     }
 
-    public static void TryAddSettingsOption<TPlugin>(
+    /*public static void TryAddSettingsOption<TPlugin>(
         IRoleSide roleSide,
         GameModes gameMode = GameModes.Normal,
         int order = 31)
@@ -32,5 +30,5 @@ public static class RoleSideOptionHelper
             CustomSettingsOptionManager.Instance.Add(
                 new CustomSettingsNumberOption<TPlugin>(roleSide.AmountOption, gameMode, order));
         }
-    }
+    }*/
 }

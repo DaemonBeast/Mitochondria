@@ -11,6 +11,6 @@ public class BindingAttribute : Attribute
     {
         TypeUtils.RegisterAttribute<BindingAttribute, IBinding>(
             assembly,
-            type => Binder.Instance.Register(type));
+            type => BindingManager.Instance.Register(type));
     }
 }

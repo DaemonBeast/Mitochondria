@@ -1,5 +1,5 @@
 ﻿using Mitochondria.Core.Api.Networking;
-using Mitochondria.Core.Api.Owner;
+using Mitochondria.Core.Api.Plugin;
 
 namespace Mitochondria.Core.Api.Options;
 

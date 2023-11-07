@@ -14,17 +14,21 @@ public abstract class RoleSide : IRoleSide
 
     public abstract bool IsImpostor { get; }
 
-    public ICustomNumberOption? AmountOption => _amountOption ??= _amountOptionFactory?.Invoke(this);
+    public ICustomNumberOption? AmountOption { get; }
 
     public RoleTeamTypes TeamType { get; }
 
-    private readonly Func<IRoleSide, ICustomNumberOption>? _amountOptionFactory;
-
-    private ICustomNumberOption? _amountOption;
-
-    protected RoleSide(Func<IRoleSide, ICustomNumberOption>? amountOptionFactory = null, RoleTeamTypes? teamType = null)
+    protected RoleSide(Func<IRoleSide, ICustomNumberOption>? amountOptionFactory = null)
     {
-        _amountOptionFactory = amountOptionFactory;
-        TeamType = teamType ?? CustomRoleManager.Instance.CreateRoleTeamType();
+        TeamType = CustomRoleManager.Instance.CreateRoleTeamType();
+        AmountOption = amountOptionFactory?.Invoke(this);
+    }
+
+    protected internal RoleSide(
+        RoleTeamTypes teamType,
+        Func<IRoleSide, ICustomNumberOption>? amountOptionFactory = null)
+    {
+        TeamType = teamType;
+        AmountOption = amountOptionFactory?.Invoke(this);
     }
 }

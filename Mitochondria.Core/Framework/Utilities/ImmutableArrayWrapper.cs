@@ -18,7 +18,7 @@ public class ImmutableArrayWrapper<T> : ImmutableArrayWrapper
         }
     }
 
-    public ICollection<T> Actual { get; }
+    public ICollection<T> Actual { get; set; }
 
     public int Length => Immutable.Length;
 

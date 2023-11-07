@@ -40,7 +40,7 @@ public class YamlStorage : IStorage
         _serializer.Serialize(streamWriter, obj);
     }
 
-    public T Load<T>(string fileName, IEnumerable<string>? altFileNames = null, bool useCached = true)
+    public IStorageHandle<T> Load<T>(string fileName, IEnumerable<string>? altFileNames = null, bool useCached = true)
         where T : class
     {
         if (useCached &&
@@ -49,7 +49,7 @@ public class YamlStorage : IStorage
                 out var cachedObj) &&
             cachedObj is T typedObj)
         {
-            return typedObj;
+            return new StorageHandle<T>(typedObj, () => Save(fileName, typedObj));
         }
         
         foreach (var path in StorageConfiguration.GetAbsoluteLoadPaths(fileName, altFileNames))
@@ -75,7 +75,7 @@ public class YamlStorage : IStorage
 
                 Save(fileName, obj);
 
-                return obj;
+                return new StorageHandle<T>(obj, () => Save(fileName, obj));
             }
             catch
             {
@@ -87,7 +87,7 @@ public class YamlStorage : IStorage
 
         Save(fileName, newObj);
 
-        return newObj;
+        return new StorageHandle<T>(newObj, () => Save(fileName, newObj));
     }
 
     public void Delete(string fileName, IEnumerable<string>? altFileNames = null)

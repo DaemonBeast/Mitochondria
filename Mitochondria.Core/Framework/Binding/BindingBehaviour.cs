@@ -15,7 +15,7 @@ public class BindingBehaviour : MonoBehaviour
     {
         if (Binding != null)
         {
-            Binder.Instance.Remove(Binding);
+            BindingManager.Instance.Remove(Binding);
         }
     }
 }

@@ -37,3 +37,23 @@ jobs:
         with:
           name: Mitochondria.nupkg
           path: Mitochondria.Core/bin/Release/*.nupkg
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Mitochondria
+          path: Mitochondria.ExtensionPack/bin/Release/net6.0/*.dll
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Mitochondria.nupkg
+          path: Mitochondria.ExtensionPack/bin/Release/*.nupkg
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Mitochondria
+          path: Mitochondria.Options.Settings/bin/Release/net6.0/*.dll
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Mitochondria.nupkg
+          path: Mitochondria.Options.Settings/bin/Release/*.nupkg

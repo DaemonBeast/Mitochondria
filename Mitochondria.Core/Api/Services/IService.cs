@@ -1,5 +1,5 @@
 ﻿using BepInEx;
-using Mitochondria.Core.Api.Owner;
+using Mitochondria.Core.Api.Plugin;
 using UnityEngine.SceneManagement;
 
 namespace Mitochondria.Core.Api.Services;

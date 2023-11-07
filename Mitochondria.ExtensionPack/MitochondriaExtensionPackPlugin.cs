@@ -4,7 +4,7 @@ using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Mitochondria.Core;
 using Mitochondria.Core.Framework.Options;
-using Mitochondria.Core.Framework.Options.SettingsOptions;
+using Mitochondria.Options.Settings.Framework;
 using Reactor;
 
 namespace Mitochondria.ExtensionPack;

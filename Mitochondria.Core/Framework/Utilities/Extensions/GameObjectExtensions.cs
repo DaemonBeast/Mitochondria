@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Il2CppInterop.Runtime;
+using UnityEngine;
 
 namespace Mitochondria.Core.Framework.Utilities.Extensions;
 
@@ -17,7 +18,6 @@ public static class GameObjectExtensions
         foreach (var t in parent.transform)
         {
             var gameObject = t.Cast<Transform>().gameObject;
-            
             yield return gameObject;
 
             if (recursionDepth > 1)
@@ -30,21 +30,28 @@ public static class GameObjectExtensions
         }
     }
 
-    public static bool HasAncestorWithName(this GameObject gameObject, string name, int recursionDepth = int.MaxValue)
+    public static bool HasParentWithName(this GameObject gameObject, string name, int recursionDepth = int.MaxValue)
     {
-        return GetAncestors(gameObject, recursionDepth).Any(t => t.name == name);
+        return GetParents(gameObject, recursionDepth).Any(g => g.name == name);
     }
 
-    public static IEnumerable<Transform> GetAncestors(this GameObject gameObject, int recursionDepth = int.MaxValue)
+    public static IEnumerable<GameObject> GetParents(this GameObject gameObject, int recursionDepth = int.MaxValue)
     {
         var transform = gameObject.transform.parent;
         var i = 0;
 
         while (transform != null && i++ < recursionDepth)
         {
-            yield return transform;
-
+            yield return transform.gameObject;
             transform = transform.parent;
         }
+    }
+
+    public static T GetOrAddComponent<T>(this GameObject gameObject)
+        where T : MonoBehaviour
+    {
+        return gameObject.TryGetComponent(Il2CppType.Of<T>(), out var component)
+            ? component.Cast<T>()
+            : gameObject.AddComponent<T>();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BepInEx.Unity.IL2CPP;
 using Mitochondria.Core.Api.Configuration;
+using Mitochondria.Core.Api.Storage;
 using Mitochondria.Core.Framework.Plugin;
 using Mitochondria.Core.Framework.Storage;
 using Mitochondria.Core.Framework.Utilities;
@@ -50,7 +51,7 @@ public class PluginConfig
     public void Save(IConfig config)
         => Storage.Save(config.ConfigName, config);
 
-    public TConfig Load<TConfig>()
+    public IStorageHandle<TConfig> Load<TConfig>()
         where TConfig : class, IConfig
         => Storage.Load<TConfig>(ConfigNameLookup<TConfig>.ConfigName);
 }

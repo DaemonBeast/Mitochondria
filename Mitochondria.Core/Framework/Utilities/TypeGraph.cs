@@ -94,6 +94,11 @@ public class TypeGraph<T>
     public bool TryGet(Type type, [NotNullWhen(true)] out TypeGraph<T>? typeGraph)
         => _lookupTable.TryGetValue(type, out typeGraph);
 
+    public IEnumerable<T> Traverse(Type type)
+        => TryGet(type, out var typeGraph)
+            ? typeGraph.Traverse()
+            : Array.Empty<T>();
+
     public IEnumerable<T> Traverse()
         => Children.Values.Aggregate(Values.AsEnumerable(), (current, child) => current.Concat(child.Traverse()));
 

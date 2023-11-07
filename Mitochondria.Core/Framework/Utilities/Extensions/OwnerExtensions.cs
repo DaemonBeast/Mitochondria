@@ -1,7 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Unity.IL2CPP;
-using Mitochondria.Core.Api.Owner;
-using Mitochondria.Core.Framework.Owner;
+using Mitochondria.Core.Api.Plugin;
 using Mitochondria.Core.Framework.Plugin;
 
 namespace Mitochondria.Core.Framework.Utilities.Extensions;
