@@ -1,6 +1,7 @@
 ﻿using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP;
 using Mitochondria.Core.Api.Options;
+using Mitochondria.Core.Framework.Plugin.Extensions;
 using Mitochondria.Core.Framework.Utilities.Extensions;
 
 namespace Mitochondria.Options.Settings.Abstractions;

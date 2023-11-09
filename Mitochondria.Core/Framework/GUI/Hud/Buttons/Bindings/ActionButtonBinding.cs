@@ -1,7 +1,7 @@
 ﻿using Mitochondria.Core.Api.Binding;
 using Mitochondria.Core.Api.GUI.Hud.Buttons;
 using Mitochondria.Core.Framework.Binding;
-using Mitochondria.Core.Framework.Utilities.Extensions;
+using Mitochondria.Core.Framework.Binding.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 

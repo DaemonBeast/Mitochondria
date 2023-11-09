@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Mitochondria.Core.Framework.Utilities;
+using Mitochondria.Core.Framework.Utilities.DataStructures;
 using UnityEngine;
 
 namespace Mitochondria.Core.Framework.Resources.Cache;

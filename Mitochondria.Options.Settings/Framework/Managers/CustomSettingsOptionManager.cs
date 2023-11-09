@@ -7,6 +7,7 @@ using Mitochondria.Core.Framework.Binding;
 using Mitochondria.Core.Framework.Configuration.Extensions;
 using Mitochondria.Core.Framework.GUI.Extensions;
 using Mitochondria.Core.Framework.Helpers;
+using Mitochondria.Core.Framework.Plugin.Extensions;
 using Mitochondria.Core.Framework.Utilities;
 using Mitochondria.Core.Framework.Utilities.Extensions;
 using Mitochondria.Options.Settings.Abstractions;

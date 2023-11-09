@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace Mitochondria.Core.Framework.Utilities;
+namespace Mitochondria.Core.Framework.Utilities.DataStructures;
 
 public class ImmutableArrayWrapper<T> : ImmutableArrayWrapper
 {

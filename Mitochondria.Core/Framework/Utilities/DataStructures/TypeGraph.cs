@@ -2,7 +2,7 @@
 using Il2CppInterop.Generator.Extensions;
 using Mitochondria.Core.Framework.Utilities.Extensions;
 
-namespace Mitochondria.Core.Framework.Utilities;
+namespace Mitochondria.Core.Framework.Utilities.DataStructures;
 
 public class TypeGraph<T>
 {

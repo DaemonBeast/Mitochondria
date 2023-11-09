@@ -1,6 +1,4 @@
-﻿namespace Mitochondria.Core.Framework.Utilities.Extensions;
-
-// TODO: reorganise extensions
+﻿namespace Mitochondria.Core.Framework.Binding.Extensions;
 
 public static class BindingExtensions
 {

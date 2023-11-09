@@ -2,6 +2,7 @@
 using System.Reflection;
 using Mitochondria.Core.Api.Binding;
 using Mitochondria.Core.Framework.Utilities;
+using Mitochondria.Core.Framework.Utilities.DataStructures;
 
 namespace Mitochondria.Core.Framework.Binding;
 

@@ -1,9 +1,8 @@
 ﻿using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using Mitochondria.Core.Api.Plugin;
-using Mitochondria.Core.Framework.Plugin;
 
-namespace Mitochondria.Core.Framework.Utilities.Extensions;
+namespace Mitochondria.Core.Framework.Plugin.Extensions;
 
 public static class OwnerExtensions
 {

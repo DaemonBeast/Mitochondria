@@ -1,7 +1,7 @@
 ﻿using BepInEx.Unity.IL2CPP;
 using Hazel;
 using Mitochondria.Core.Framework.Networking;
-using Mitochondria.Core.Framework.Utilities.Extensions;
+using Mitochondria.Core.Framework.Plugin.Extensions;
 using Reactor.Localization.Utilities;
 using Reactor.Networking.Serialization;
 

@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Il2CppInterop.Generator.Extensions;
 using Mitochondria.Core.Api.Binding;
 using Mitochondria.Core.Framework.Utilities;
+using Mitochondria.Core.Framework.Utilities.DataStructures;
 using Mitochondria.Core.Framework.Utilities.Extensions;
 using Reactor.Utilities;
 using UnityEngine;

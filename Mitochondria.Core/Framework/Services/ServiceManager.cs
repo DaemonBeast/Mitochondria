@@ -3,6 +3,7 @@ using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using Mitochondria.Core.Api.Services;
+using Mitochondria.Core.Framework.Plugin.Extensions;
 using Mitochondria.Core.Framework.Utilities;
 using Mitochondria.Core.Framework.Utilities.Extensions;
 

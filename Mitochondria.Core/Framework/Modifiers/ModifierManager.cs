@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Mitochondria.Core.Api.Modifiers;
 using Mitochondria.Core.Framework.Utilities;
+using Mitochondria.Core.Framework.Utilities.DataStructures;
 
 namespace Mitochondria.Core.Framework.Modifiers;
 

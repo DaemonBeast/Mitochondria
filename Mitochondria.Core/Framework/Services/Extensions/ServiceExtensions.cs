@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using Mitochondria.Core.Api.Services;
+using Mitochondria.Core.Framework.Plugin.Extensions;
 using Mitochondria.Core.Framework.Utilities.Extensions;
 
 namespace Mitochondria.Core.Framework.Services.Extensions;

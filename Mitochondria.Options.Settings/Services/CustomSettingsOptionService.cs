@@ -3,6 +3,7 @@ using Mitochondria.Core;
 using Mitochondria.Core.Api.Options;
 using Mitochondria.Core.Api.Services;
 using Mitochondria.Core.Framework.Plugin;
+using Mitochondria.Core.Framework.Plugin.Extensions;
 using Mitochondria.Core.Framework.Services;
 using Mitochondria.Core.Framework.Utilities.Extensions;
 using Mitochondria.Options.Settings.Abstractions;

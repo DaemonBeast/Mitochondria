@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using Mitochondria.Core.Framework.Utilities;
+using Mitochondria.Core.Framework.Utilities.DataStructures;
 using UnityEngine;
 
 namespace Mitochondria.Core.Api.GUI;
