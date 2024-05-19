@@ -1,4 +1,5 @@
-﻿using System.Collections;
+using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using Mitochondria.Core.Framework.Utilities.Extensions;
 using Reactor.Utilities.Extensions;
@@ -11,6 +12,8 @@ public class EmbeddedAssetBundleProvider : AssetBundleProvider
     public Assembly SourceAssembly { get; }
     
     public string Name { get; }
+
+    private static readonly Dictionary<string, AssetBundle> _loadedBundles = new Dictionary<string, AssetBundle>();
 
     private AssetBundle? _bundle;
 
@@ -35,8 +38,16 @@ public class EmbeddedAssetBundleProvider : AssetBundleProvider
             return _bundle;
         }
         
+        if (useCached && _loadedBundles.TryGetValue(Name, out var cachedBundle))
+        {
+            _bundle = cachedBundle;
+            return _bundle;
+        }
+
         using var assetBundleStream = SourceAssembly.GetManifestResourceStream(Name)!;
         _bundle = AssetBundle.LoadFromStream(assetBundleStream.AsIl2Cpp());
+
+        _loadedBundles[Name] = _bundle;
 
         return _bundle;
     }
@@ -48,12 +59,20 @@ public class EmbeddedAssetBundleProvider : AssetBundleProvider
             yield break;
         }
 
+        if (skipIfCached && _loadedBundles.TryGetValue(Name, out var cachedBundle))
+        {
+            _bundle = cachedBundle;
+            onCompleted?.Invoke(_bundle);
+            yield break;
+        }
+
         var assetBundleBytes = SourceAssembly.GetManifestResourceStream(Name)!.AsBytes();
         var request = AssetBundle.LoadFromMemoryAsync(assetBundleBytes);
 
         request.add_completed((Action<AsyncOperation>) (_ =>
         {
             _bundle = request.assetBundle;
+            _loadedBundles[Name] = _bundle;
             onCompleted?.Invoke(_bundle);
         }));
     }
