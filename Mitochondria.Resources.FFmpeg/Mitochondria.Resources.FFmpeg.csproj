@@ -3,6 +3,10 @@
     <Import Project="../Common.props" />
     <Import Project="../AmongUs.props" />
 
+    <PropertyGroup>
+        <Description>FFmpeg module for Mitochondria</Description>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\Mitochondria.Core\Mitochondria.Core.csproj" />
     </ItemGroup>

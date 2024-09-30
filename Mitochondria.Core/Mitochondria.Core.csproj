@@ -3,4 +3,8 @@
     <Import Project="../Common.props" />
     <Import Project="../AmongUs.props" />
 
+    <PropertyGroup>
+        <Description>Core module for Mitochondria; an Among Us modding API</Description>
+    </PropertyGroup>
+
 </Project>

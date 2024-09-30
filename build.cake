@@ -9,12 +9,14 @@ var tag = workflow.RefType == GitHubActionsRefType.Tag ? workflow.RefName : null
 var rootDir = Directory(".");
 var buildDir = rootDir + Directory("build");
 var binDir = buildDir + Directory("bin");
+var packagesDir = buildDir + Directory("packages");
 var cacheDir = buildDir + Directory("cache");
 var tempDir = buildDir + Directory("temp");
 var outputDir = tempDir + Directory("output");
 
 EnsureDirectoryExists(buildDir);
 EnsureDirectoryExists(binDir);
+EnsureDirectoryExists(packagesDir);
 EnsureDirectoryExists(cacheDir);
 EnsureDirectoryExists(tempDir);
 
@@ -54,6 +56,8 @@ Task("Build")
             EnsureDirectoryExists(assemblyOutputDir);
             CopyFile(filePath, assemblyOutputPath);
         }
+
+        CopyFiles(System.IO.Path.Combine(outputDir, "*.nupkg"), packagesDir);
 
         RunTarget("DownloadFFmpegBinary");
 
