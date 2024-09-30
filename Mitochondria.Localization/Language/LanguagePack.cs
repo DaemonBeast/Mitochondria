@@ -6,7 +6,7 @@ using Mitochondria.Core.Utilities;
 using Mitochondria.Core.Utilities.Extensions;
 using Reactor.Utilities;
 
-namespace Mitochondria.Localization;
+namespace Mitochondria.Localization.Language;
 
 public class LanguagePack
 {

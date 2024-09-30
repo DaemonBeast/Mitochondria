@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Reactor.Utilities;
 
-namespace Mitochondria.Localization;
+namespace Mitochondria.Localization.Language;
 
 public class LanguageFile
 {

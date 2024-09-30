@@ -2,7 +2,7 @@
 using Mitochondria.Core.Utilities;
 using Reactor.Utilities;
 
-namespace Mitochondria.Localization;
+namespace Mitochondria.Localization.Language;
 
 // TODO: add optional expiry to saved language packs
 public class LanguagePackManager

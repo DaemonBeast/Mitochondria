@@ -11,8 +11,4 @@
         <PackageReference Include="Reactor" Version="2.3.1" />
     </ItemGroup>
 
-    <Target Name="Copy" AfterTargets="Build" Condition="'$(AmongUs)' != ''">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(AmongUs)/BepInEx/plugins/" UseSymboliclinksIfPossible="true" />
-    </Target>
-
 </Project>

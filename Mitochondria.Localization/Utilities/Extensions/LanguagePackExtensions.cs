@@ -1,4 +1,5 @@
-﻿using Reactor.Localization;
+﻿using Mitochondria.Localization.Language;
+using Reactor.Localization;
 
 namespace Mitochondria.Localization.Utilities.Extensions;
 

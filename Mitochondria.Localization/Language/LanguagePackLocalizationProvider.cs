@@ -1,6 +1,6 @@
 ﻿using Reactor.Localization;
 
-namespace Mitochondria.Localization;
+namespace Mitochondria.Localization.Language;
 
 public class LanguagePackLocalizationProvider : LocalizationProvider
 {

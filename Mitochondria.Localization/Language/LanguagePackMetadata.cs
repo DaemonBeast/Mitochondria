@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Mitochondria.Localization;
+namespace Mitochondria.Localization.Language;
 
 public class LanguagePackMetadata
 {

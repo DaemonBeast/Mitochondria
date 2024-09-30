@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Localization",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Resources", "Mitochondria.Resources\Mitochondria.Resources.csproj", "{C030302E-157E-4272-A9F3-63DA56C3FF47}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Resources.FFmpeg", "Mitochondria.Resources.FFmpeg\Mitochondria.Resources.FFmpeg.csproj", "{A15A9ABB-C18C-4BB8-A577-A573212B79B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{C030302E-157E-4272-A9F3-63DA56C3FF47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C030302E-157E-4272-A9F3-63DA56C3FF47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C030302E-157E-4272-A9F3-63DA56C3FF47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A15A9ABB-C18C-4BB8-A577-A573212B79B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A15A9ABB-C18C-4BB8-A577-A573212B79B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A15A9ABB-C18C-4BB8-A577-A573212B79B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A15A9ABB-C18C-4BB8-A577-A573212B79B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
