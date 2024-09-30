@@ -10,6 +10,7 @@ var rootDir = Directory(".");
 var buildDir = rootDir + Directory("build");
 var binDir = buildDir + Directory("bin");
 var packagesDir = buildDir + Directory("packages");
+var archiveDir = buildDir + Directory("archives");
 var cacheDir = buildDir + Directory("cache");
 var tempDir = buildDir + Directory("temp");
 var outputDir = tempDir + Directory("output");
@@ -17,6 +18,7 @@ var outputDir = tempDir + Directory("output");
 EnsureDirectoryExists(buildDir);
 EnsureDirectoryExists(binDir);
 EnsureDirectoryExists(packagesDir);
+EnsureDirectoryExists(archiveDir);
 EnsureDirectoryExists(cacheDir);
 EnsureDirectoryExists(tempDir);
 
@@ -27,6 +29,8 @@ Task("Build")
     .Does(ctx =>
     {
         CleanDirectory(binDir);
+        CleanDirectory(packagesDir);
+        CleanDirectory(archiveDir);
         CleanDirectory(tempDir);
         EnsureDirectoryExists(outputDir);
 
@@ -48,6 +52,8 @@ Task("Build")
 
         DotNetBuild(".", settings);
 
+        RunTarget("DownloadFFmpegBinary");
+
         foreach (var filePath in GetFiles(System.IO.Path.Combine(outputDir, "*.dll")))
         {
             var assemblyName = filePath.GetFilenameWithoutExtension().ToString();
@@ -55,11 +61,13 @@ Task("Build")
             var assemblyOutputPath = System.IO.Path.Combine(assemblyOutputDir, $"{assemblyName}.dll");
             EnsureDirectoryExists(assemblyOutputDir);
             CopyFile(filePath, assemblyOutputPath);
+
+            Zip(assemblyOutputDir, System.IO.Path.Combine(archiveDir, $"{assemblyName}.zip"));
         }
 
-        CopyFiles(System.IO.Path.Combine(outputDir, "*.nupkg"), packagesDir);
+        Zip(binDir, System.IO.Path.Combine(archiveDir, "Mitochondria.zip"));
 
-        RunTarget("DownloadFFmpegBinary");
+        CopyFiles(System.IO.Path.Combine(outputDir, "*.nupkg"), packagesDir);
 
         DeleteDirectory(tempDir, new DeleteDirectorySettings
         {
@@ -118,6 +126,7 @@ Task("DownloadFFmpegBinary")
         }
 
         var ffmpegProjectDir = System.IO.Path.Combine(binDir, "Mitochondria.Resources.FFmpeg");
+        EnsureDirectoryExists(ffmpegProjectDir);
 
         Context.FileSystem.GetFile(ffmpegBinaryPath).Copy(System.IO.Path.Combine(ffmpegProjectDir, "ffmpeg.exe"), true);
 

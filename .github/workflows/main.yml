@@ -25,3 +25,16 @@ jobs:
         with:
           name: Mitochondria
           path: build/bin/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Packages
+          path: build/packages/
+
+      - uses: softprops/action-gh-release@v1
+        if: github.ref_type == 'tag'
+        with:
+          draft: true
+          files: |
+            build/archives/*
+            build/packages/*

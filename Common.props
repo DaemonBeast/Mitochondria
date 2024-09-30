@@ -9,7 +9,7 @@
         <DebugType>embedded</DebugType>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-        <Version>0.7.1</Version>
+        <Version>0.7.2</Version>
         <Authors>Daemon</Authors>
 
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
