@@ -15,7 +15,11 @@ public static class FFmpegUtils
         var data = process.StandardOutput.BaseStream.ReadFully();
         var output = process.StandardOutput.CurrentEncoding.GetString(data);
 
-        return output.Split('|').Select(p => p.Split('=')).ToDictionary(p => p[0], p => p[1]);
+        return output
+            .Split('|')
+            .Select(p => p.Split('='))
+            .DistinctBy(p => p[0])
+            .ToDictionary(p => p[0], p => p[1]);
     }
 
     public static Process CreateFFmpegProcess(string arguments)
