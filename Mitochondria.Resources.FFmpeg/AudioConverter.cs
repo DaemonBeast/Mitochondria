@@ -1,27 +1,36 @@
-﻿using Mitochondria.Resources.FFmpeg.Utilities;
-using Reactor.Utilities.Extensions;
+﻿using Mitochondria.Core.Utilities.Extensions;
+using Mitochondria.Resources.FFmpeg.Utilities;
 
 namespace Mitochondria.Resources.FFmpeg;
 
 public static class AudioConverter
 {
-    public static float[] ToPcmFloat32BitLittleEndian(
+    public static async Task<float[]> ToPcmFloat32BitLittleEndianAsync(
         string fileName,
-        out int channels,
-        out int sampleRate,
-        out string? title)
+        CancellationToken cancellationToken = default)
     {
         var process = FFmpegUtils.CreateFFmpegProcess($"-i \"{fileName}\" -f f32le -acodec pcm_f32le pipe:1");
         process.Start();
 
-        var data = process.StandardOutput.BaseStream.ReadFully();
+        var data = await process.StandardOutput.BaseStream.ReadFullyAsync(cancellationToken);
+        return ToSamples(data);
+    }
+
+    public static async Task<float[]> ToPcmFloat32BitLittleEndianAsync(
+        Stream inputStream,
+        CancellationToken cancellationToken = default)
+    {
+        var process = FFmpegUtils.CreateFFmpegProcess("-i - -f f32le -acodec pcm_f32le pipe:1");
+        process.Start();
+
+        var data = await FFmpegProcessUtils.PipeFullyAsync(process, inputStream, cancellationToken);
+        return ToSamples(data);
+    }
+
+    private static float[] ToSamples(byte[] data)
+    {
         var samples = new float[data.Length / sizeof(float)];
         Buffer.BlockCopy(data, 0, samples, 0, data.Length);
-
-        var info = FFmpegUtils.GetAudioFileInfo(fileName);
-        channels = int.Parse(info["channels"]);
-        sampleRate = int.Parse(info["sample_rate"]);
-        title = info.GetValueOrDefault("tag:title"); 
 
         return samples;
     }

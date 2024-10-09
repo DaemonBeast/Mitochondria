@@ -6,6 +6,8 @@ var workflow = BuildSystem.GitHubActions.Environment.Workflow;
 var buildId = workflow.RunNumber;
 var tag = workflow.RefType == GitHubActionsRefType.Tag ? workflow.RefName : null;
 
+var skipArchive = Argument<bool>("skip_archive", false);
+
 var rootDir = Directory(".");
 var buildDir = rootDir + Directory("build");
 var binDir = buildDir + Directory("bin");
@@ -62,10 +64,16 @@ Task("Build")
             EnsureDirectoryExists(assemblyOutputDir);
             CopyFile(filePath, assemblyOutputPath);
 
-            Zip(assemblyOutputDir, System.IO.Path.Combine(archiveDir, $"{assemblyName}.zip"));
+            if (!skipArchive)
+            {
+                Zip(assemblyOutputDir, System.IO.Path.Combine(archiveDir, $"{assemblyName}.zip"));
+            }
         }
 
-        Zip(binDir, System.IO.Path.Combine(archiveDir, "Mitochondria.zip"));
+        if (!skipArchive)
+        {
+            Zip(binDir, System.IO.Path.Combine(archiveDir, "Mitochondria.zip"));
+        }
 
         CopyFiles(System.IO.Path.Combine(outputDir, "*.nupkg"), packagesDir);
 
