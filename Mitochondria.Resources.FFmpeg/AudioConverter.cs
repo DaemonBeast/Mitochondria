@@ -9,7 +9,7 @@ public static class AudioConverter
         string fileName,
         CancellationToken cancellationToken = default)
     {
-        var process = FFmpegUtils.CreateFFmpegProcess($"-i \"{fileName}\" -f f32le -acodec pcm_f32le pipe:1");
+        using var process = FFmpegUtils.CreateFFmpegProcess($"-i \"{fileName}\" -f f32le -acodec pcm_f32le pipe:1");
         process.Start();
 
         var data = await process.StandardOutput.BaseStream.ReadFullyAsync(cancellationToken);
@@ -20,7 +20,7 @@ public static class AudioConverter
         Stream inputStream,
         CancellationToken cancellationToken = default)
     {
-        var process = FFmpegUtils.CreateFFmpegProcess("-i - -f f32le -acodec pcm_f32le pipe:1");
+        using var process = FFmpegUtils.CreateFFmpegProcess("-i - -f f32le -acodec pcm_f32le pipe:1");
         process.Start();
 
         var data = await FFmpegProcessUtils.PipeFullyAsync(process, inputStream, cancellationToken);

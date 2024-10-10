@@ -9,7 +9,7 @@ public static class FFmpegUtils
         string fileName,
         CancellationToken cancellationToken = default)
     {
-        var process = CreateFFprobeProcess(
+        using var process = CreateFFprobeProcess(
             $"-i \"{fileName}\" -show_format -show_streams -select_streams a:0 -of compact=p=0 -v 0");
 
         process.Start();
@@ -23,7 +23,9 @@ public static class FFmpegUtils
         Stream inputStream,
         CancellationToken cancellationToken = default)
     {
-        var process = CreateFFprobeProcess("-i - -show_format -show_streams -select_streams a:0 -of compact=p=0 -v 0");
+        using var process = CreateFFprobeProcess(
+            "-i - -show_format -show_streams -select_streams a:0 -of compact=p=0 -v 0");
+
         process.Start();
 
         var data = await FFmpegProcessUtils.PipeFullyAsync(process, inputStream, cancellationToken);
