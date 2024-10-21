@@ -14,7 +14,7 @@ public partial class MitochondriaResourcesFFmpegPlugin : BasePlugin
 
     public override void Load()
     {
-        if (Constants.Paths.FFmpegExe == null || Constants.Paths.FFprobeExe == null)
+        if (Core.Constants.Paths.FFmpegExe == null || Core.Constants.Paths.FFprobeExe == null)
         {
             throw new FileNotFoundException("FFmpeg or FFprobe executable not found");
         }

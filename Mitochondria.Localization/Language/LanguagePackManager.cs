@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using Mitochondria.Core.Utilities;
+using Mitochondria.Core.Utilities.Structures;
 using Reactor.Utilities;
 
 namespace Mitochondria.Localization.Language;

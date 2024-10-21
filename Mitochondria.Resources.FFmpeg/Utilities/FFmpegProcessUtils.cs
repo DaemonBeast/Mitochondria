@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Diagnostics;
+using Mitochondria.Core.Utilities.Extensions;
 
 namespace Mitochondria.Resources.FFmpeg.Utilities;
 
@@ -10,50 +11,48 @@ public static class FFmpegProcessUtils
         Stream inputStream,
         CancellationToken cancellationToken = default)
     {
-        using var memoryStream = new MemoryStream();
-        await PipeAsync(process, inputStream, memoryStream, cancellationToken);
-        return memoryStream.ToArray();
+        var inputTask = Task.Run(
+            () => CopyToStandardInputAsync(process, inputStream, cancellationToken),
+            cancellationToken);
+
+        var output = await process.StandardOutput.BaseStream.ReadFullyAsync(cancellationToken);
+
+        await inputTask;
+        return output;
     }
 
-    public static async Task PipeAsync(
+    public static async Task CopyToStandardInputAsync(
         Process process,
         Stream inputStream,
-        Stream outputStream,
         CancellationToken cancellationToken = default)
     {
         var processInputStream = process.StandardInput.BaseStream;
 
-        var inputTask = Task.Run(
-            async () =>
+        using var bufferOwner = MemoryPool<byte>.Shared.Rent(Core.Constants.BufferSize);
+        var buffer = bufferOwner.Memory;
+        var exceptionCount = 0;
+        int count;
+
+        while ((count = await inputStream.ReadAsync(buffer, cancellationToken)) > 0)
+        {
+            try
             {
-                using var bufferOwner = MemoryPool<byte>.Shared.Rent(81920);
-                var buffer = bufferOwner.Memory;
-                var exceptionCount = 0;
-                int count;
+                await processInputStream.WriteAsync(buffer[..count], cancellationToken);
+            }
+            catch (IOException) when (++exceptionCount == 1)
+            {
+                // The first write causes a broken pipe exception to be thrown, but ignoring it appears to be fine, so
+                // unless you know a fix, have this friendly message :)
+            }
+        }
 
-                while ((count = await inputStream.ReadAsync(buffer, cancellationToken)) != 0)
-                {
-                    try
-                    {
-                        await processInputStream.WriteAsync(buffer[..count], cancellationToken);
-                    }
-                    catch (IOException) when (++exceptionCount == 1)
-                    {
-                        // The first write causes a broken pipe exception to be thrown, but ignoring it appears to be
-                        // fine, so unless you can fix it, this exists :)
-                    }
-                }
-
-                await processInputStream.FlushAsync(cancellationToken);
-                processInputStream.Close();
-            },
-            cancellationToken);
-
-        var outputTask = Task.Run(
-            async () => await process.StandardOutput.BaseStream.CopyToAsync(outputStream, cancellationToken),
-            cancellationToken);
-
-        await inputTask;
-        await outputTask;
+        await processInputStream.FlushAsync(cancellationToken);
     }
+
+    /// <remarks>
+    /// A rudimentary attempt at preventing injection attacks in a probably already insecure environment.
+    /// Internal access only because nobody else should ever be calling this.
+    /// </remarks>
+    internal static string VeryPoorlySanitizeFileName(string fileName)
+        => fileName.Replace("\"", "\\\"");
 }

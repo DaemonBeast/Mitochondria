@@ -25,7 +25,7 @@ EnsureDirectoryExists(cacheDir);
 EnsureDirectoryExists(tempDir);
 
 const string ffmpegZipUrl =
-    "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2024-09-28-13-00/ffmpeg-N-117234-g8a951ef5e1-win64-lgpl.zip";
+    "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2024-09-30-15-36/ffmpeg-N-117275-g04182b5549-win64-lgpl.zip";
 
 Task("Build")
     .Does(ctx =>
@@ -116,7 +116,10 @@ Task("DownloadFFmpegBinary")
             {
                 if (directoryPath.Segments[^1].StartsWith("ffmpeg"))
                 {
-                    DeleteDirectory(directoryPath, new DeleteDirectorySettings());
+                    DeleteDirectory(directoryPath, new DeleteDirectorySettings()
+                    {
+                        Recursive = true
+                    });
                 }
             }
 

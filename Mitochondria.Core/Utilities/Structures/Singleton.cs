@@ -1,4 +1,4 @@
-﻿namespace Mitochondria.Core.Utilities;
+﻿namespace Mitochondria.Core.Utilities.Structures;
 
 public static class Singleton<T>
 {

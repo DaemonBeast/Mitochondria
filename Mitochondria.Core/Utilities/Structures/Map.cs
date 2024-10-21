@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Mitochondria.Core.Utilities;
+namespace Mitochondria.Core.Utilities.Structures;
 
 public class Map<T1, T2> : IDictionary<T1, T2>
     where T1: notnull

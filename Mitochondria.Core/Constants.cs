@@ -1,7 +1,12 @@
-﻿namespace Mitochondria.Resources.FFmpeg;
+﻿namespace Mitochondria.Core;
 
 public static class Constants
 {
+    /// <remarks>
+    /// 128 KiB.
+    /// </remarks>
+    public const int BufferSize = 131072;
+
     public static class Paths
     {
         // Make sure they exist on plugin load

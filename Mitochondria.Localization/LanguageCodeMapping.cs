@@ -1,4 +1,4 @@
-﻿using Mitochondria.Core.Utilities;
+﻿using Mitochondria.Core.Utilities.Structures;
 
 namespace Mitochondria.Localization;
 

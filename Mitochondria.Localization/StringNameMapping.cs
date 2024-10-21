@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Mitochondria.Core.Utilities;
+using Mitochondria.Core.Utilities.Structures;
 using Reactor.Localization.Utilities;
 
 namespace Mitochondria.Localization;
