@@ -12,7 +12,12 @@ public static class FFmpegProcessUtils
         CancellationToken cancellationToken = default)
     {
         var inputTask = Task.Run(
-            () => CopyToStandardInputAsync(process, inputStream, cancellationToken),
+            async () =>
+            {
+                await CopyToStandardInputAsync(process, inputStream, cancellationToken);
+                // Close the stdin stream so that FFmpeg knows we're done
+                process.StandardInput.Close();
+            },
             cancellationToken);
 
         var output = await process.StandardOutput.BaseStream.ReadFullyAsync(cancellationToken);

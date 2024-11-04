@@ -29,8 +29,11 @@ public static class FFmpegUtils
         using var process = CreateFFprobeProcess($"-i - {AudioInfoArguments}");
         process.Start();
 
+        var encoding = process.StandardOutput.CurrentEncoding;
         var data = await FFmpegProcessUtils.PipeFullyAsync(process, inputStream, cancellationToken);
-        var output = process.StandardOutput.CurrentEncoding.GetString(data);
+        process.Close();
+
+        var output = encoding.GetString(data);
         return ParseInfo(output);
     }
 

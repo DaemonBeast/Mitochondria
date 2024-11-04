@@ -185,17 +185,14 @@ public static class AudioClipUtils
         var channels = int.Parse(info["stream.0.channels"]);
         var sampleRate = int.Parse(info["stream.0.sample_rate"]);
 
-        // TODO: may fail for some formats (e.g. webm) when streamed
-        // This appears to be due to the stream duration being missing (to be expected since it's being streamed in so
-        // the file metadata is unavailable) and because of the "packet.0" being missing; it seems that formats like
-        // webm have much less packets than other formats and attempting to use "-read_intervals 999999999" with ffprobe
-        // results in the last packet ("packet.0") to be missing from the results
-        var durationTimestamp = info.TryGetValue("stream.0.duration_ts", out var d)
-            ? long.Parse(d)
-            : long.Parse(info["packet.0.pts"]) + long.Parse(info["packet.0.duration"]);
-
         var timeBaseParts = info["stream.0.time_base"].Split("/", 2);
         var timeBase = new TimeBase(int.Parse(timeBaseParts[0]), int.Parse(timeBaseParts[1]));
+
+        var durationTimestamp = info.TryGetValue("stream.0.duration_ts", out var sd)
+            ? long.Parse(sd)
+            : info.TryGetValue("packet.0.pts", out var s) && info.TryGetValue("packet.0.duration", out var pd)
+                ? long.Parse(s) + long.Parse(pd)
+                : (long) (double.Parse(info["format.duration"]) * timeBase.Denominator / timeBase.Numerator);
 
         var title = info.GetValueOrDefault("format.tags.title");
 

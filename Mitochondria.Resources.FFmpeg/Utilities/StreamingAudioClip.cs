@@ -52,8 +52,6 @@ public class StreamingAudioClip : IDisposable
 
     private void OnAudioRead(Il2CppStructArray<float> data)
     {
-        // TODO: make method to write data and store position data has been written up to to allow for buffering instead of gaps
-
         var containedLength = Math.Min(data.Length, Math.Max(0, Data.Length - PlaybackPosition));
 
         for (var i = 0; i < containedLength; i++)
