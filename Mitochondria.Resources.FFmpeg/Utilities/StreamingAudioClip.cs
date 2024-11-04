@@ -21,10 +21,10 @@ public class StreamingAudioClip : IDisposable
     public StreamingAudioClip(string name, AudioClipUtils.AudioMetadata metadata)
     {
         var length = (int)
-            (metadata.SampleRate * metadata.Channels * metadata.DurationTimestamp * metadata.TimeBase.Numerator /
+            (metadata.SampleRate * metadata.DurationTimestamp * metadata.TimeBase.Numerator /
              metadata.TimeBase.Denominator);
 
-        Data = new Half[length];
+        Data = new Half[length * metadata.Channels];
         Array.Fill(Data, (Half) 0);
 
         AudioClip = AudioClip.Create(
