@@ -46,7 +46,8 @@ public static class AudioClipUtils
 
     public static async Task<StreamingAudioClip> CreateStreamingAudioClipAsync(
         string fileName,
-        Func<ValueTask>? onEnd = null,
+        Func<ValueTask>? onStreamingStart = null,
+        Func<ValueTask>? onStreamingEnd = null,
         CancellationToken cancellationToken = default)
     {
         var metadata = await GetAudioMetadataAsync(fileName, cancellationToken);
@@ -57,10 +58,11 @@ public static class AudioClipUtils
         using var ffmpegOutputStreamOwner = AudioConverter.ToPcmF32LeStream(fileName);
         var ffmpegOutputStream = ffmpegOutputStreamOwner.Stream;
 
-        await CreateStreamingAudioClipAsyncInternal(
+        CreateStreamingAudioClipAsyncInternal(
             streamingAudioClip,
             ffmpegOutputStream,
-            onEnd,
+            onStreamingStart,
+            onStreamingEnd,
             cancellationToken);
 
         return streamingAudioClip;
@@ -68,7 +70,8 @@ public static class AudioClipUtils
 
     public static async Task<StreamingAudioClip> CreateStreamingAudioClipAsync(
         Stream inputStream,
-        Func<ValueTask>? onEnd = null,
+        Func<ValueTask>? onStreamingStart = null,
+        Func<ValueTask>? onStreamingEnd = null,
         CancellationToken cancellationToken = default)
     {
         if (!inputStream.CanSeek)
@@ -85,10 +88,11 @@ public static class AudioClipUtils
 
         var ffmpegOutputStream = AudioConverter.ToPcmF32LeStream(inputStream, cancellationToken);
 
-        await CreateStreamingAudioClipAsyncInternal(
+        CreateStreamingAudioClipAsyncInternal(
             streamingAudioClip,
             ffmpegOutputStream,
-            onEnd,
+            onStreamingStart,
+            onStreamingEnd,
             cancellationToken);
 
         return streamingAudioClip;
@@ -110,13 +114,24 @@ public static class AudioClipUtils
         return ParseAudioMetadata(info);
     }
 
-    private static async Task CreateStreamingAudioClipAsyncInternal(
+    private static void CreateStreamingAudioClipAsyncInternal(
         StreamingAudioClip streamingAudioClip,
         Stream ffmpegOutputStream,
-        Func<ValueTask>? onEnd = null,
+        Func<ValueTask>? onStreamingStart = null,
+        Func<ValueTask>? onStreamingEnd = null,
         CancellationToken cancellationToken = default)
     {
         var taskCompletionSource = new TaskCompletionSource();
+
+        _ = taskCompletionSource.Task.ContinueWith(
+            async _ =>
+            {
+                if (onStreamingStart != null)
+                {
+                    await onStreamingStart.Invoke();
+                }
+            },
+            cancellationToken);
 
         _ = Task
             .Run(
@@ -174,10 +189,15 @@ public static class AudioClipUtils
                     }
                 },
                 cancellationToken)
-            .ContinueWith(_ => onEnd?.Invoke(), cancellationToken);
-
-        // Wait till there's some data before continuing
-        await taskCompletionSource.Task;
+            .ContinueWith(
+                async _ =>
+                {
+                    if (onStreamingEnd != null)
+                    {
+                        await onStreamingEnd.Invoke();
+                    }
+                },
+                cancellationToken);
     }
 
     private static AudioMetadata ParseAudioMetadata(Dictionary<string, string> info)

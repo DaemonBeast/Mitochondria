@@ -6,6 +6,8 @@ namespace Mitochondria.Resources.FFmpeg.Utilities;
 
 public class StreamingAudioClip : IDisposable
 {
+    public AudioClipUtils.AudioMetadata Metadata { get; }
+
     public AudioClip AudioClip { get; }
 
     // TODO: make version with no caching? Would mean no seeking (maybe start new process at point seeked to?)
@@ -20,6 +22,8 @@ public class StreamingAudioClip : IDisposable
 
     public StreamingAudioClip(string name, AudioClipUtils.AudioMetadata metadata)
     {
+        Metadata = metadata;
+
         var length = (int)
             (metadata.SampleRate * metadata.DurationTimestamp * metadata.TimeBase.Numerator /
              metadata.TimeBase.Denominator);
@@ -64,12 +68,12 @@ public class StreamingAudioClip : IDisposable
             return;
         }
 
-        Ended?.Invoke();
-
         for (var i = containedLength; i < data.Length; i++)
         {
             data[i] = 0;
         }
+
+        Ended?.Invoke();
     }
 
     private void OnAudioSetPosition(int newPosition)
