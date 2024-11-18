@@ -12,7 +12,7 @@ public class FFmpegOutputStreamOwner : IFFmpegStreamOwner
     {
         _process = process;
 
-        Stream = process.StandardOutput.BaseStream;
+        Stream = _process.StandardOutput.BaseStream;
     }
 
     public void Dispose()

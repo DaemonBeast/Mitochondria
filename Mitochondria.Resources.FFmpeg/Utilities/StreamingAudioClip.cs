@@ -1,81 +1,152 @@
+using System.Buffers;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Reactor.Utilities.Extensions;
+using Mitochondria.Core.Utilities.Extensions;
 using UnityEngine;
 
 namespace Mitochondria.Resources.FFmpeg.Utilities;
 
-public class StreamingAudioClip : IDisposable
+public class StreamingAudioClip : IAsyncDisposable
 {
     public AudioClipUtils.AudioMetadata Metadata { get; }
 
-    public AudioClip AudioClip { get; }
-
-    // TODO: make version with no caching? Would mean no seeking (maybe start new process at point seeked to?)
-    // TODO: make version with floats instead of halves to improve quality while sacrificing memory?
-    public Half[] Data { get; private set; }
+    public AudioClip AudioClip { get; private set; } = null!;
 
     public int PlaybackPosition { get; private set; }
 
-    public bool AtEnd => PlaybackPosition >= Data.Length;
+    private SpinLock _spinLock;
+    private int _writePosition;
 
-    public event Action? Ended;
+    // TODO: make version with no caching? Would mean no seeking (maybe start new process at point seeked to?)
+    private readonly IMemoryOwner<Half> _dataOwner;
+    private Memory<Half>? _data;
 
-    public StreamingAudioClip(string name, AudioClipUtils.AudioMetadata metadata)
+    private bool _disposed;
+
+    public static async Task<StreamingAudioClip> CreateAsync(string name, AudioClipUtils.AudioMetadata metadata)
     {
-        Metadata = metadata;
-
         var length = (int)
             (metadata.SampleRate * metadata.DurationTimestamp * metadata.TimeBase.Numerator /
              metadata.TimeBase.Denominator);
 
-        Data = new Half[length * metadata.Channels];
-        Array.Fill(Data, (Half) 0);
+        var streamingAudioClip = new StreamingAudioClip(metadata, length);
 
-        AudioClip = AudioClip.Create(
+        var audioClip = await AudioClipUtils.CreateAudioClipAsync(
             name,
             length,
             metadata.Channels,
             metadata.SampleRate,
             false,
             true,
-            (Action<Il2CppStructArray<float>>) OnAudioRead,
-            (Action<int>) OnAudioSetPosition);
+            streamingAudioClip.OnAudioRead,
+            streamingAudioClip.OnAudioSetPosition);
+
+        streamingAudioClip.AudioClip = audioClip;
+
+        return streamingAudioClip;
     }
 
-    public void Dispose()
+    private StreamingAudioClip(AudioClipUtils.AudioMetadata metadata, int length)
     {
-        if (AudioClip != null)
-        {
-            AudioClip.Destroy();
-        }
+        Metadata = metadata;
 
-        Data = null!;
-
-        GC.SuppressFinalize(this);
+        _dataOwner = MemoryPool<Half>.Shared.Rent(length * metadata.Channels);
+        _data = _dataOwner.Memory;
+        _data.Value.Span.Fill((Half) 0);
     }
 
-    private void OnAudioRead(Il2CppStructArray<float> data)
+    public void Write(float[] source, int length)
     {
-        var containedLength = Math.Min(data.Length, Math.Max(0, Data.Length - PlaybackPosition));
-
-        for (var i = 0; i < containedLength; i++)
-        {
-            data[i] = (float) Data[PlaybackPosition++];
-        }
-
-        if (containedLength == data.Length)
+        if (!_data.HasValue)
         {
             return;
         }
 
-        for (var i = containedLength; i < data.Length; i++)
+        if (length < 0 || length >= source.Length)
         {
-            data[i] = 0;
+            throw new ArgumentOutOfRangeException(nameof(length));
         }
 
-        Ended?.Invoke();
+        Span<Half> sourceHalfSpan = stackalloc Half[length];
+        var destinationHalfSpan = _data.Value.Span.Slice(_writePosition, length);
+
+        _writePosition += length;
+
+        for (var i = 0; i < length; i++)
+        {
+            sourceHalfSpan[i] = (Half) source[i];
+        }
+
+        var lockTaken = false;
+        try
+        {
+            _spinLock.Enter(ref lockTaken);
+            sourceHalfSpan.CopyTo(destinationHalfSpan);
+        }
+        finally
+        {
+            if (lockTaken)
+            {
+                _spinLock.Exit();
+            }
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        if (_disposed)
+        {
+            return ValueTask.CompletedTask;
+        }
+
+        _disposed = true;
+        GC.SuppressFinalize(this);
+
+        _dataOwner.Dispose();
+        _data = null;
+
+        return AudioClip == null ? ValueTask.CompletedTask : new ValueTask(AudioClip.DestroyAsync());
+    }
+
+    private void OnAudioRead(Il2CppStructArray<float> data)
+    {
+        if (!_data.HasValue)
+        {
+            data.AsSpan().Fill(0f);
+            return;
+        }
+
+        var length = data.Length;
+
+        Span<float> sourceFloatSpan = stackalloc float[length];
+        var sourceHalfSpan = _data.Value.Span.Slice(PlaybackPosition, length);
+        var destinationFloatSpan = data.AsSpan();
+
+        PlaybackPosition += length;
+
+        for (var i = 0; i < length; i++)
+        {
+            sourceFloatSpan[i] = (float) sourceHalfSpan[i];
+        }
+
+        var lockTaken = false;
+        try
+        {
+            _spinLock.Enter(ref lockTaken);
+            sourceFloatSpan.CopyTo(destinationFloatSpan);
+        }
+        finally
+        {
+            if (lockTaken)
+            {
+                _spinLock.Exit();
+            }
+            else
+            {
+                data.AsSpan().Fill(0f);
+            }
+        }
     }
 
     private void OnAudioSetPosition(int newPosition)
-        => PlaybackPosition = newPosition;
+        => PlaybackPosition = newPosition * Metadata.Channels;
 }

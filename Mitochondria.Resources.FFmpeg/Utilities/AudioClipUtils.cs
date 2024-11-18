@@ -1,6 +1,8 @@
 ﻿using System.Buffers;
-using System.Runtime.CompilerServices;
+using System.Collections;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Mitochondria.Core.Utilities.Extensions;
+using Reactor.Utilities;
 using UnityEngine;
 
 namespace Mitochondria.Resources.FFmpeg.Utilities;
@@ -13,9 +15,9 @@ public static class AudioClipUtils
     {
         var samples = await AudioConverter.ToPcmF32LeAsync(filePath, cancellationToken);
         var metadata = await GetAudioMetadataAsync(filePath, cancellationToken);
-        var name = metadata.Title ?? Path.GetFileName(filePath);
+        var name = metadata.Title ?? Path.GetFileNameWithoutExtension(filePath);
 
-        return CreateAudioClip(name, samples, metadata);
+        return await CreateAudioClipAsync(name, samples, metadata);
     }
 
     public static async Task<AudioClip> CreateAudioClipAsync(
@@ -33,39 +35,115 @@ public static class AudioClipUtils
         var metadata = await GetAudioMetadataAsync(inputStream, cancellationToken);
 
         var name = metadata.Title ?? "UNTITLED";
-        return CreateAudioClip(name, samples, metadata);
+        return await CreateAudioClipAsync(name, samples, metadata);
     }
 
-    public static AudioClip CreateAudioClip(string name, float[] samples, AudioMetadata metadata)
+    public static async Task<AudioClip> CreateAudioClipAsync(string name, float[] samples, AudioMetadata metadata)
     {
-        var audioClip = AudioClip.Create(name, samples.Length, metadata.Channels, metadata.SampleRate, false, false);
-        audioClip.SetData(samples, 0);
+        var taskCompletionSource = new TaskCompletionSource<AudioClip>();
 
+        Coroutines.Start(
+            CoCreateAudioClip(
+                name,
+                samples.Length,
+                metadata.Channels,
+                metadata.SampleRate,
+                false,
+                false,
+                audioClip => taskCompletionSource.TrySetResult(audioClip)));
+
+        var audioClip = await taskCompletionSource.Task;
+        audioClip.SetData(samples, 0);
+        return audioClip;
+    }
+
+    public static async Task<AudioClip> CreateAudioClipAsync(
+        string name,
+        int lengthSamples,
+        int channels,
+        int frequency,
+        bool _3D,
+        bool stream)
+    {
+        var taskCompletionSource = new TaskCompletionSource<AudioClip>();
+
+        Coroutines.Start(
+            CoCreateAudioClip(
+                name,
+                lengthSamples,
+                channels,
+                frequency,
+                _3D,
+                stream,
+                audioClip => taskCompletionSource.TrySetResult(audioClip)));
+
+        var audioClip = await taskCompletionSource.Task;
+        return audioClip;
+    }
+
+    public static async Task<AudioClip> CreateAudioClipAsync(
+        string name,
+        int lengthSamples,
+        int channels,
+        int frequency,
+        bool _3D,
+        bool stream,
+        Action<Il2CppStructArray<float>> onAudioRead,
+        Action<int> onAudioSetPosition)
+    {
+        var taskCompletionSource = new TaskCompletionSource<AudioClip>();
+
+        Coroutines.Start(
+            CoCreateAudioClip(
+                name,
+                lengthSamples,
+                channels,
+                frequency,
+                _3D,
+                stream,
+                onAudioRead,
+                onAudioSetPosition,
+                audioClip => taskCompletionSource.TrySetResult(audioClip)));
+
+        var audioClip = await taskCompletionSource.Task;
         return audioClip;
     }
 
     public static async Task<StreamingAudioClip> CreateStreamingAudioClipAsync(
-        string fileName,
+        string filePath,
         Func<ValueTask>? onStreamingStart = null,
         Func<ValueTask>? onStreamingEnd = null,
         CancellationToken cancellationToken = default)
     {
-        var metadata = await GetAudioMetadataAsync(fileName, cancellationToken);
+        var metadata = await GetAudioMetadataAsync(filePath, cancellationToken);
 
-        var name = metadata.Title ?? fileName;
-        var streamingAudioClip = new StreamingAudioClip(name, metadata);
+        var name = metadata.Title ?? Path.GetFileNameWithoutExtension(filePath);
 
-        using var ffmpegOutputStreamOwner = AudioConverter.ToPcmF32LeStream(fileName);
+        var ffmpegOutputStreamOwner = AudioConverter.ToPcmF32LeStream(filePath);
         var ffmpegOutputStream = ffmpegOutputStreamOwner.Stream;
 
-        CreateStreamingAudioClipAsyncInternal(
-            streamingAudioClip,
-            ffmpegOutputStream,
-            onStreamingStart,
-            onStreamingEnd,
-            cancellationToken);
+        var streamingAudioClip = await StreamingAudioClip.CreateAsync(name, metadata);
 
-        return streamingAudioClip;
+        try
+        {
+            PipeIntoStreamingAudioClipAsync(
+                streamingAudioClip,
+                ffmpegOutputStream,
+                onStreamingStart,
+                () =>
+                {
+                    ffmpegOutputStreamOwner.Dispose();
+                    return onStreamingEnd?.Invoke() ?? ValueTask.CompletedTask;
+                },
+                cancellationToken);
+
+            return streamingAudioClip;
+        }
+        catch
+        {
+            await streamingAudioClip.DisposeAsync();
+            throw;
+        }
     }
 
     public static async Task<StreamingAudioClip> CreateStreamingAudioClipAsync(
@@ -84,18 +162,27 @@ public static class AudioClipUtils
         inputStream.Seek(0, SeekOrigin.Begin);
 
         var name = metadata.Title ?? "UNTITLED";
-        var streamingAudioClip = new StreamingAudioClip(name, metadata);
 
         var ffmpegOutputStream = AudioConverter.ToPcmF32LeStream(inputStream, cancellationToken);
 
-        CreateStreamingAudioClipAsyncInternal(
-            streamingAudioClip,
-            ffmpegOutputStream,
-            onStreamingStart,
-            onStreamingEnd,
-            cancellationToken);
+        var streamingAudioClip = await StreamingAudioClip.CreateAsync(name, metadata);
 
-        return streamingAudioClip;
+        try
+        {
+            PipeIntoStreamingAudioClipAsync(
+                streamingAudioClip,
+                ffmpegOutputStream,
+                onStreamingStart,
+                onStreamingEnd,
+                cancellationToken);
+
+            return streamingAudioClip;
+        }
+        catch
+        {
+            await streamingAudioClip.DisposeAsync();
+            throw;
+        }
     }
 
     public static async Task<AudioMetadata> GetAudioMetadataAsync(
@@ -114,7 +201,37 @@ public static class AudioClipUtils
         return ParseAudioMetadata(info);
     }
 
-    private static void CreateStreamingAudioClipAsyncInternal(
+    private static IEnumerator CoCreateAudioClip(
+        string name,
+        int lengthSamples,
+        int channels,
+        int frequency,
+        bool _3D,
+        bool stream,
+        Action<AudioClip> onEnd)
+    {
+        yield return null;
+        onEnd.Invoke(AudioClip.Create(name, lengthSamples, channels, frequency, _3D, stream));
+    }
+
+    private static IEnumerator CoCreateAudioClip(
+        string name,
+        int lengthSamples,
+        int channels,
+        int frequency,
+        bool _3D,
+        bool stream,
+        Action<Il2CppStructArray<float>> onAudioRead,
+        Action<int> onAudioSetPosition,
+        Action<AudioClip> onEnd)
+    {
+        yield return null;
+
+        onEnd.Invoke(
+            AudioClip.Create(name, lengthSamples, channels, frequency, _3D, stream, onAudioRead, onAudioSetPosition));
+    }
+
+    private static void PipeIntoStreamingAudioClipAsync(
         StreamingAudioClip streamingAudioClip,
         Stream ffmpegOutputStream,
         Func<ValueTask>? onStreamingStart = null,
@@ -133,71 +250,61 @@ public static class AudioClipUtils
             },
             cancellationToken);
 
+        var byteBufferOwner = MemoryPool<byte>.Shared.Rent(Core.Constants.BufferSize);
+        var byteBuffer = byteBufferOwner.Memory;
+        // Ensure the buffer can fit floats snugly to prevent excess bytes needing to be copied to the start
+        byteBuffer = byteBuffer[..^(byteBuffer.Length % sizeof(float))];
+
+        var excess = ReadOnlyMemory<byte>.Empty;
+
+        var sampleBuffer = ArrayPool<float>.Shared.Rent(byteBuffer.Length / sizeof(float));
+        var sampleBufferMemory = sampleBuffer.AsMemory();
+
         _ = Task
             .Run(
                 async () =>
                 {
-                    using var byteBufferOwner = MemoryPool<byte>.Shared.Rent(Core.Constants.BufferSize);
-                    var byteBuffer = byteBufferOwner.Memory;
-                    // Ensure the buffer can fit floats snugly to prevent excess bytes needing to be copied to the start
-                    byteBuffer = byteBuffer[..^(byteBuffer.Length % sizeof(float))];
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                    var position = 0;
-                    var excess = ReadOnlyMemory<byte>.Empty;
-
-                    var sampleBuffer = ArrayPool<float>.Shared.Rent(byteBuffer.Length / sizeof(float));
-                    var sampleBufferMemory = sampleBuffer.AsMemory();
-                    var sizeOfHalf = Unsafe.SizeOf<Half>();
-
-                    try
+                    int byteCount;
+                    while ((byteCount = await ffmpegOutputStream.ReadAsync(
+                               byteBuffer[excess.Length..],
+                               cancellationToken).AsTask().WaitAsync(cancellationToken)) > 0)
                     {
-                        int byteCount;
-                        while ((byteCount = await ffmpegOutputStream.ReadAsync(
-                                   byteBuffer[excess.Length..],
-                                   cancellationToken)) > 0)
+                        var hasExcess = byteBuffer[..byteCount].BlockCast(
+                            sampleBufferMemory,
+                            out excess,
+                            out var elementCount,
+                            out _);
+
+                        streamingAudioClip.Write(sampleBuffer, elementCount);
+
+                        // Could probably move this out the loop, but then I'd have to duplicate code and ugh
+                        if (taskCompletionSource is { } t)
                         {
-                            var hasExcess = byteBuffer[..byteCount].BlockCast(
-                                sampleBufferMemory,
-                                out excess,
-                                out var elementCount,
-                                out var castedByteCount);
+                            _ = t.TrySetResult();
+                            taskCompletionSource = null;
+                        }
 
-                            for (var i = 0; i < castedByteCount / sizeOfHalf; i++)
-                            {
-                                // There's gotta be a better way
-                                streamingAudioClip.Data[position + i] = (Half) sampleBuffer[i];
-                            }
-
-                            // Could probably move this out the loop, but then I'd have to duplicate code and ugh
-                            if (taskCompletionSource is { } t)
-                            {
-                                _ = t.TrySetResult();
-                                taskCompletionSource = null;
-                            }
-
-                            position += elementCount;
-
-                            if (hasExcess)
-                            {
-                                excess.CopyTo(byteBuffer);
-                            }
+                        if (hasExcess)
+                        {
+                            excess.CopyTo(byteBuffer);
                         }
                     }
-                    finally
-                    {
-                        ArrayPool<float>.Shared.Return(sampleBuffer);
-                    }
                 },
-                cancellationToken)
+                CancellationToken.None)
             .ContinueWith(
                 async _ =>
                 {
+                    byteBufferOwner.Dispose();
+                    ArrayPool<float>.Shared.Return(sampleBuffer);
+
                     if (onStreamingEnd != null)
                     {
                         await onStreamingEnd.Invoke();
                     }
                 },
-                cancellationToken);
+                CancellationToken.None);
     }
 
     private static AudioMetadata ParseAudioMetadata(Dictionary<string, string> info)
