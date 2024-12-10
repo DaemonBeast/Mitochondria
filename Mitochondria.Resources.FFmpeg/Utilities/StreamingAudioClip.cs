@@ -17,8 +17,8 @@ public class StreamingAudioClip : IAsyncDisposable
     private int _writePosition;
 
     // TODO: make version with no caching? Would mean no seeking (maybe start new process at point seeked to?)
-    private readonly IMemoryOwner<Half> _dataOwner;
-    private Memory<Half>? _data;
+    private readonly IMemoryOwner<float> _dataOwner;
+    private Memory<float>? _data;
 
     private bool _disposed;
 
@@ -49,9 +49,9 @@ public class StreamingAudioClip : IAsyncDisposable
     {
         Metadata = metadata;
 
-        _dataOwner = MemoryPool<Half>.Shared.Rent(length * metadata.Channels);
+        _dataOwner = MemoryPool<float>.Shared.Rent(length * metadata.Channels);
         _data = _dataOwner.Memory;
-        _data.Value.Span.Fill((Half) 0);
+        _data.Value.Span.Fill(0f);
     }
 
     public void Write(float[] source, int length)
@@ -66,21 +66,16 @@ public class StreamingAudioClip : IAsyncDisposable
             throw new ArgumentOutOfRangeException(nameof(length));
         }
 
-        Span<Half> sourceHalfSpan = stackalloc Half[length];
-        var destinationHalfSpan = _data.Value.Span.Slice(_writePosition, length);
+        var sourceSpan = new ReadOnlySpan<float>(source, 0, length);
 
+        var destination = _data.Value.Span.Slice(_writePosition, length);
         _writePosition += length;
-
-        for (var i = 0; i < length; i++)
-        {
-            sourceHalfSpan[i] = (Half) source[i];
-        }
 
         var lockTaken = false;
         try
         {
             _spinLock.Enter(ref lockTaken);
-            sourceHalfSpan.CopyTo(destinationHalfSpan);
+            sourceSpan.CopyTo(destination);
         }
         finally
         {
@@ -116,33 +111,32 @@ public class StreamingAudioClip : IAsyncDisposable
         }
 
         var length = data.Length;
-
-        Span<float> sourceFloatSpan = stackalloc float[length];
-        var sourceHalfSpan = _data.Value.Span.Slice(PlaybackPosition, length);
-        var destinationFloatSpan = data.AsSpan();
-
+        var source = _data.Value.Span.Slice(PlaybackPosition, length);
         PlaybackPosition += length;
 
-        for (var i = 0; i < length; i++)
-        {
-            sourceFloatSpan[i] = (float) sourceHalfSpan[i];
-        }
+        var destination = data.AsSpan();
 
         var lockTaken = false;
         try
         {
             _spinLock.Enter(ref lockTaken);
-            sourceFloatSpan.CopyTo(destinationFloatSpan);
+            source.CopyTo(destination);
+        }
+        catch
+        {
+            if (lockTaken)
+            {
+                lockTaken = false;
+                _spinLock.Exit();
+            }
+
+            data.AsSpan().Fill(0f);
         }
         finally
         {
             if (lockTaken)
             {
                 _spinLock.Exit();
-            }
-            else
-            {
-                data.AsSpan().Fill(0f);
             }
         }
     }

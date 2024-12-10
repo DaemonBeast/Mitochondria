@@ -38,7 +38,7 @@ public static class AudioConverter
         var sanitizedFileName = FFmpegProcessUtils.VeryPoorlySanitizeFileName(fileName);
 
         var process =
-            FFmpegUtils.CreateFFmpegProcess($"-i {sanitizedFileName} {PcmFloat32BitLittleEndianArguments} pipe:1");
+            FFmpegUtils.CreateFFmpegProcess($"-i \"{sanitizedFileName}\" {PcmFloat32BitLittleEndianArguments} pipe:1");
 
         process.Start();
 

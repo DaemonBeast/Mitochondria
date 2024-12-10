@@ -40,7 +40,7 @@ public static class FFmpegUtils
     public static Process CreateFFmpegProcess(string arguments)
     {
         var process = CreateProcess(arguments);
-        process.StartInfo.FileName = Core.Constants.Paths.FFmpegExe;
+        process.StartInfo.FileName = Constants.Paths.FFmpegExe;
 
         return process;
     }
@@ -48,7 +48,7 @@ public static class FFmpegUtils
     public static Process CreateFFprobeProcess(string arguments)
     {
         var process = CreateProcess(arguments);
-        process.StartInfo.FileName = Core.Constants.Paths.FFprobeExe;
+        process.StartInfo.FileName = Constants.Paths.FFprobeExe;
 
         return process;
     }
@@ -72,8 +72,7 @@ public static class FFmpegUtils
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
+                RedirectStandardOutput = true
             }
         };
     }

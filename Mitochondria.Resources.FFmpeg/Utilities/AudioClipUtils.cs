@@ -250,7 +250,7 @@ public static class AudioClipUtils
             },
             cancellationToken);
 
-        var byteBufferOwner = MemoryPool<byte>.Shared.Rent(Core.Constants.BufferSize);
+        var byteBufferOwner = MemoryPool<byte>.Shared.Rent(Constants.BufferSize);
         var byteBuffer = byteBufferOwner.Memory;
         // Ensure the buffer can fit floats snugly to prevent excess bytes needing to be copied to the start
         byteBuffer = byteBuffer[..^(byteBuffer.Length % sizeof(float))];

@@ -1,4 +1,4 @@
-﻿namespace Mitochondria.Core;
+﻿namespace Mitochondria.Resources.FFmpeg;
 
 public static class Constants
 {

@@ -33,7 +33,7 @@ public static class FFmpegProcessUtils
     {
         var processInputStream = process.StandardInput.BaseStream;
 
-        using var bufferOwner = MemoryPool<byte>.Shared.Rent(Core.Constants.BufferSize);
+        using var bufferOwner = MemoryPool<byte>.Shared.Rent(Constants.BufferSize);
         var buffer = bufferOwner.Memory;
         var exceptionCount = 0;
         int count;
