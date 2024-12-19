@@ -2,7 +2,7 @@
 
 public class ResourceHandle<T> : IDisposable
 {
-    public T Resource => _node.Resource;
+    public T Resource => _node.Resource!;
 
     public bool Loaded => _node.Loaded;
 
@@ -33,14 +33,14 @@ public class ResourceHandle<T> : IDisposable
 
     public class ResourceNode
     {
-        public T Resource { get; }
+        public T? Resource { get; private set; }
 
         public bool Loaded { get; private set; }
 
-        private readonly Action _unload;
+        private readonly Action<ResourceNode> _unload;
         private readonly List<ResourceHandle<T>> _handles;
 
-        public ResourceNode(T resource, Action unload)
+        public ResourceNode(T resource, Action<ResourceNode> unload)
         {
             Resource = resource;
             _unload = unload;
@@ -61,8 +61,35 @@ public class ResourceHandle<T> : IDisposable
             _handles.Remove(handle);
             if (_handles.Count == 0)
             {
-                _unload.Invoke();
+                _unload.Invoke(this);
+                Resource = default;
             }
+        }
+    }
+
+    public class ResourceProvider
+    {
+        private ResourceNode? _node;
+
+        private readonly Func<T> _load;
+        private readonly Action<ResourceNode> _unload;
+
+        public ResourceProvider(Func<T> load, Action<ResourceNode> unload)
+        {
+            _load = load;
+            _unload = unload;
+        }
+
+        public ResourceHandle<T> AcquireHandle()
+        {
+            _node ??= new ResourceNode(_load.Invoke(), UnloadNode);
+            return _node.AcquireHandle();
+        }
+
+        private void UnloadNode(ResourceNode node)
+        {
+            _unload.Invoke(node);
+            _node = null;
         }
     }
 }
