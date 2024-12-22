@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Mitochondria.Core.Utilities;
 using Mitochondria.Core.Utilities.Extensions;
 
 namespace Mitochondria.Resources.FFmpeg.Utilities;
@@ -16,6 +17,7 @@ public static class FFmpegUtils
 
         using var process = CreateFFprobeProcess($"-i \"{sanitizedFileName}\" {AudioInfoArguments}");
         process.Start();
+        ChildProcessWatchdog.KillOnParentExit(process);
 
         var data = await process.StandardOutput.BaseStream.ReadFullyAsync(cancellationToken);
         var output = process.StandardOutput.CurrentEncoding.GetString(data);
@@ -28,6 +30,7 @@ public static class FFmpegUtils
     {
         using var process = CreateFFprobeProcess($"-i - {AudioInfoArguments}");
         process.Start();
+        ChildProcessWatchdog.KillOnParentExit(process);
 
         var encoding = process.StandardOutput.CurrentEncoding;
         var data = await FFmpegProcessUtils.PipeFullyAsync(process, inputStream, cancellationToken);

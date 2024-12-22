@@ -1,4 +1,5 @@
-﻿using Mitochondria.Core.Utilities.Extensions;
+﻿using Mitochondria.Core.Utilities;
+using Mitochondria.Core.Utilities.Extensions;
 using Mitochondria.Resources.FFmpeg.Utilities;
 
 namespace Mitochondria.Resources.FFmpeg;
@@ -17,6 +18,7 @@ public static class AudioConverter
             FFmpegUtils.CreateFFmpegProcess($"-i \"{sanitizedFileName}\" {PcmFloat32BitLittleEndianArguments} pipe:1");
 
         process.Start();
+        ChildProcessWatchdog.KillOnParentExit(process);
 
         var data = await process.StandardOutput.BaseStream.ReadFullyAsync(cancellationToken);
         return ToPcmF32LeSamples(data);
@@ -28,6 +30,7 @@ public static class AudioConverter
     {
         using var process = FFmpegUtils.CreateFFmpegProcess($"-i - {PcmFloat32BitLittleEndianArguments} pipe:1");
         process.Start();
+        ChildProcessWatchdog.KillOnParentExit(process);
 
         var data = await FFmpegProcessUtils.PipeFullyAsync(process, inputStream, cancellationToken);
         return ToPcmF32LeSamples(data);
@@ -41,6 +44,7 @@ public static class AudioConverter
             FFmpegUtils.CreateFFmpegProcess($"-i \"{sanitizedFileName}\" {PcmFloat32BitLittleEndianArguments} pipe:1");
 
         process.Start();
+        ChildProcessWatchdog.KillOnParentExit(process);
 
         return new FFmpegOutputStreamOwner(process);
     }
@@ -51,6 +55,7 @@ public static class AudioConverter
     {
         var process = FFmpegUtils.CreateFFmpegProcess($"-i - {PcmFloat32BitLittleEndianArguments} pipe:1");
         process.Start();
+        ChildProcessWatchdog.KillOnParentExit(process);
 
         _ = Task.Run(
             async () =>
