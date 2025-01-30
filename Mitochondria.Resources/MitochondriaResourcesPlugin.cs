@@ -2,6 +2,7 @@
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Mitochondria.Core;
+using Mitochondria.Resources.Addressables.Patches;
 
 namespace Mitochondria.Resources;
 
@@ -14,6 +15,8 @@ public partial class MitochondriaResourcesPlugin : BasePlugin
 
     public override void Load()
     {
+        AddressablesPatches.LoadAssetPatch.Initialize();
+
         Harmony.PatchAll();
     }
 

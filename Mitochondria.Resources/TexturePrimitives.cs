@@ -4,7 +4,7 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Mitochondria.Core.Utilities.Extensions;
 using UnityEngine;
 
-namespace Mitochondria.Resources.Primitives;
+namespace Mitochondria.Resources;
 
 public static class TexturePrimitives
 {

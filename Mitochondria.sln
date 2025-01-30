@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Resources", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Resources.FFmpeg", "Mitochondria.Resources.FFmpeg\Mitochondria.Resources.FFmpeg.csproj", "{A15A9ABB-C18C-4BB8-A577-A573212B79B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Resources.Primitives", "Mitochondria.Resources.Primitives\Mitochondria.Resources.Primitives.csproj", "{1033DFF2-7BF3-432E-8F66-CFE04957B802}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Input", "Mitochondria.Input\Mitochondria.Input.csproj", "{20EB5946-0BF3-435D-900D-3551AA110964}"
 EndProject
 Global
@@ -34,10 +32,6 @@ Global
 		{A15A9ABB-C18C-4BB8-A577-A573212B79B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A15A9ABB-C18C-4BB8-A577-A573212B79B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A15A9ABB-C18C-4BB8-A577-A573212B79B2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1033DFF2-7BF3-432E-8F66-CFE04957B802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1033DFF2-7BF3-432E-8F66-CFE04957B802}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1033DFF2-7BF3-432E-8F66-CFE04957B802}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1033DFF2-7BF3-432E-8F66-CFE04957B802}.Release|Any CPU.Build.0 = Release|Any CPU
 		{20EB5946-0BF3-435D-900D-3551AA110964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{20EB5946-0BF3-435D-900D-3551AA110964}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20EB5946-0BF3-435D-900D-3551AA110964}.Release|Any CPU.ActiveCfg = Release|Any CPU
