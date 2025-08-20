@@ -4,6 +4,7 @@ using HarmonyLib;
 using Il2CppInterop.Common;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Runtime;
+using Mitochondria.Resources.Provider;
 using Mitochondria.Resources.Utilities;
 using Reactor.Utilities;
 using UnityEngine.AddressableAssets;

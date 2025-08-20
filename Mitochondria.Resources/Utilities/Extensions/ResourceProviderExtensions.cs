@@ -1,3 +1,5 @@
+using Mitochondria.Resources.Provider;
+
 namespace Mitochondria.Resources.Utilities.Extensions;
 
 public static class ResourceProviderExtensions

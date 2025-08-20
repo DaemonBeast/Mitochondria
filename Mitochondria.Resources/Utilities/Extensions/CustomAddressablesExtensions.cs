@@ -1,4 +1,5 @@
 using Mitochondria.Resources.Addressables;
+using Mitochondria.Resources.Provider;
 
 namespace Mitochondria.Resources.Utilities.Extensions;
 

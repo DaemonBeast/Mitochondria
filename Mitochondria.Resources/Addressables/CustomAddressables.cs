@@ -1,3 +1,5 @@
+using Mitochondria.Resources.Provider;
+
 namespace Mitochondria.Resources.Addressables;
 
 public static class CustomAddressables

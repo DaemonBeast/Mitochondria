@@ -1,4 +1,4 @@
-﻿namespace Mitochondria.Resources;
+﻿namespace Mitochondria.Resources.Provider;
 
 public class ResourceHandle<T> : ResourceHandle
 {
