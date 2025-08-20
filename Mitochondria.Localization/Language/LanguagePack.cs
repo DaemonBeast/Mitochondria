@@ -44,7 +44,7 @@ public class LanguagePack
             // ignored
         }
 
-        return fallbackToCache ? await LanguagePackManager.Instance.TryLoad(languagePackId) : null;
+        return fallbackToCache ? await LanguagePackManager.TryLoad(languagePackId) : null;
     }
 
     public static async Task<LanguagePack?> CreateFromGitHub<TPlugin>(
@@ -91,7 +91,7 @@ public class LanguagePack
 
             if (cacheData.TryGetValue(fileNameWithoutExtension, out var fileHash) &&
                 fileHash == repositoryContent.Sha &&
-                await LanguagePackManager.Instance.TryLoadLanguageFile(languagePackId, language) is { } languageFile)
+                await LanguagePackManager.TryLoadLanguageFile(languagePackId, language) is { } languageFile)
             {
                 languageFiles.Add(languageFile);
                 continue;
@@ -110,7 +110,7 @@ public class LanguagePack
         LanguagePack languagePack;
         if (cacheData.TryGetValue("metadata", out var metadataHash) &&
             metadataHash == metadataContent.Sha &&
-            await LanguagePackManager.Instance.LoadOnlyMetadata(languagePackId) is { } pack)
+            await LanguagePackManager.LoadOnlyMetadata(languagePackId) is { } pack)
         {
             languagePack = pack;
         }
@@ -139,7 +139,7 @@ public class LanguagePack
             languagePack.LanguageFiles.Add(languageFile.Language, languageFile);
         }
 
-        if (await LanguagePackManager.Instance.TrySave(languagePack, downloadedLanguages.Contains))
+        if (await LanguagePackManager.TrySave(languagePack, downloadedLanguages.Contains))
         {
             await using var cacheDataStream = File.OpenWrite(cacheDataPath);
             await JsonSerializer.SerializeAsync(cacheDataStream, cacheData);

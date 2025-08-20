@@ -17,7 +17,7 @@ public partial class MitochondriaCorePlugin : BasePlugin
     {
         Harmony.PatchAll();
 
-        AddComponent<GameUtilities.GameLoadWatcherBehaviour>();
+        AddComponent<GameUtils.GameLoadWatcherBehaviour>();
     }
 
     public override bool Unload()

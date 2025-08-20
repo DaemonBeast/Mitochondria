@@ -1,15 +1,12 @@
 ﻿using System.Text.Json;
-using Mitochondria.Core.Utilities.Structures;
 using Reactor.Utilities;
 
 namespace Mitochondria.Localization.Language;
 
 // TODO: add optional expiry to saved language packs
-public class LanguagePackManager
+public static class LanguagePackManager
 {
-    public static LanguagePackManager Instance => Singleton<LanguagePackManager>.Instance;
-
-    public async Task<LanguagePack?> TryLoad(string id, Func<SupportedLangs, bool>? shouldLoadLanguage = null)
+    public static async Task<LanguagePack?> TryLoad(string id, Func<SupportedLangs, bool>? shouldLoadLanguage = null)
     {
         try
         {
@@ -21,7 +18,9 @@ public class LanguagePackManager
         }
     }
 
-    public async Task<bool> TrySave(LanguagePack languagePack, Func<SupportedLangs, bool>? shouldSaveLanguage = null)
+    public static async Task<bool> TrySave(
+        LanguagePack languagePack,
+        Func<SupportedLangs, bool>? shouldSaveLanguage = null)
     {
         try
         {
@@ -34,7 +33,7 @@ public class LanguagePackManager
         }
     }
 
-    public async Task<LanguagePack?> Load(string id, Func<SupportedLangs, bool>? shouldLoadLanguage = null)
+    public static async Task<LanguagePack?> Load(string id, Func<SupportedLangs, bool>? shouldLoadLanguage = null)
     {
         var shouldLoadLanguageInternal = shouldLoadLanguage ?? (_ => true);
 
@@ -76,7 +75,7 @@ public class LanguagePackManager
         return languagePack;
     }
 
-    public async Task<LanguagePack?> LoadOnlyMetadata(string languagePackId)
+    public static async Task<LanguagePack?> LoadOnlyMetadata(string languagePackId)
     {
         var languagePackPath = GetLanguagePackPath(languagePackId);
         if (!Directory.Exists(languagePackPath))
@@ -99,7 +98,7 @@ public class LanguagePackManager
         return new LanguagePack(languagePackId, metadata);
     }
 
-    public async Task<LanguageFile?> TryLoadLanguageFile(string languagePackId, SupportedLangs language)
+    public static async Task<LanguageFile?> TryLoadLanguageFile(string languagePackId, SupportedLangs language)
     {
         var languageCode = LanguageCodeMapping.Languages.Reverse[language];
         var languagePackPath = GetLanguagePackPath(languagePackId);
@@ -124,7 +123,7 @@ public class LanguagePackManager
         }
     }
 
-    public async Task Save(LanguagePack languagePack, Func<SupportedLangs, bool>? shouldSaveLanguage = null)
+    public static async Task Save(LanguagePack languagePack, Func<SupportedLangs, bool>? shouldSaveLanguage = null)
     {
         var shouldSaveLanguageInternal = shouldSaveLanguage ?? (_ => true);
 
