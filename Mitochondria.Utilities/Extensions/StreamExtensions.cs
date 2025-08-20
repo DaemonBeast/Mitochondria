@@ -1,4 +1,4 @@
-namespace Mitochondria.Core.Utilities.Extensions;
+namespace Mitochondria.Utilities.Extensions;
 
 public static class StreamExtensions
 {

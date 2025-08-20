@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Mitochondria.Core.Utilities.Extensions;
+namespace Mitochondria.Utilities.Extensions;
 
 public static class SpanExtensions
 {

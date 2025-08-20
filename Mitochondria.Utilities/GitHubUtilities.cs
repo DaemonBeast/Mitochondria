@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 
-namespace Mitochondria.Core.Utilities;
+namespace Mitochondria.Utilities;
 
-public static class GitHubUtils<TPlugin>
+public static class GitHubUtilities<TPlugin>
     where TPlugin : BasePlugin
 {
     public static HttpClient Client
@@ -14,7 +14,7 @@ public static class GitHubUtils<TPlugin>
         {
             var metadata = MetadataHelper.GetMetadata(typeof(TPlugin));
             var userAgent = $"{metadata.GUID}/{metadata.Version}";
-            return _client ??= HttpUtils.CreateGitHubClient(userAgent);
+            return _client ??= HttpUtilities.CreateGitHubClient(userAgent);
         }
     }
 

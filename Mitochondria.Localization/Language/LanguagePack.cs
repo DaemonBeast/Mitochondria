@@ -2,8 +2,8 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using BepInEx.Unity.IL2CPP;
-using Mitochondria.Core.Utilities;
-using Mitochondria.Core.Utilities.Extensions;
+using Mitochondria.Utilities;
+using Mitochondria.Utilities.Extensions;
 using Reactor.Utilities;
 
 namespace Mitochondria.Localization.Language;
@@ -55,7 +55,7 @@ public class LanguagePack
         bool ignoreCache = false)
         where TPlugin : BasePlugin
     {
-        if (await GitHubUtils<TPlugin>.TryGetRepositoryContents(repositoryOwner, repositoryName, repositorySubPath)
+        if (await GitHubUtilities<TPlugin>.TryGetRepositoryContents(repositoryOwner, repositoryName, repositorySubPath)
             is not { } repositoryContents)
         {
             Logger<MitochondriaLocalizationPlugin>.Error("Failed to get GitHub repository contents for language pack");
@@ -75,7 +75,7 @@ public class LanguagePack
 
         var cacheData = ignoreCache
             ? new Dictionary<string, string>()
-            : await JsonUtils.DeserializeAsyncOrNew(cacheDataPath, () => new Dictionary<string, string>());
+            : await JsonUtilities.DeserializeAsyncOrNew(cacheDataPath, () => new Dictionary<string, string>());
 
         var languageFiles = new List<LanguageFile>();
         var languageFileTasks = new List<Task<LanguageFile?>>();
@@ -120,7 +120,7 @@ public class LanguagePack
 
             try
             {
-                metadata = (await GitHubUtils<TPlugin>.Client
+                metadata = (await GitHubUtilities<TPlugin>.Client
                     .GetFromJsonAsync<LanguagePackMetadata>(metadataContent.DownloadUrl))!;
             }
             catch
@@ -176,7 +176,7 @@ public class LanguagePack
         string downloadUrl)
         where TPlugin : BasePlugin
     {
-        var fileStream = await GitHubUtils<TPlugin>.Client.GetStreamAsync(downloadUrl);
+        var fileStream = await GitHubUtilities<TPlugin>.Client.GetStreamAsync(downloadUrl);
         return await LanguageFile.TryParse(language, fileStream);
     }
 }

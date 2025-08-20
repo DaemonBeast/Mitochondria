@@ -1,13 +1,15 @@
 ﻿using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
-using Mitochondria.Core;
+using Mitochondria.Utilities;
+using Reactor;
 
 namespace Mitochondria.Resources.FFmpeg;
 
 [BepInAutoPlugin("astral.mitochondria.resources.ffmpeg")]
 [BepInProcess("Among Us.exe")]
-[BepInDependency(MitochondriaCorePlugin.Id)]
+[BepInDependency(ReactorPlugin.Id)]
+[BepInDependency(MitochondriaUtilitiesPlugin.Id)]
 public partial class MitochondriaResourcesFFmpegPlugin : BasePlugin
 {
     public Harmony Harmony { get; } = new(Id);

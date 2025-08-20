@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using Mitochondria.Core.Utilities;
-using Mitochondria.Core.Utilities.Extensions;
+using Mitochondria.Utilities;
+using Mitochondria.Utilities.Extensions;
 
 namespace Mitochondria.Resources.FFmpeg.Utilities;
 

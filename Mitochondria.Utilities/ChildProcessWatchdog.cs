@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Mitochondria.Core.Utilities;
+namespace Mitochondria.Utilities;
 
 // TODO: Not sure if this is actually working.
 public static class ChildProcessWatchdog

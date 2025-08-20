@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Headers;
 
-namespace Mitochondria.Core.Utilities;
+namespace Mitochondria.Utilities;
 
-public static class HttpUtils
+public static class HttpUtilities
 {
     public static HttpClient CreateGitHubClient(string userAgent)
     {
@@ -12,7 +12,7 @@ public static class HttpUtils
         httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd(userAgent);
 
         httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
-            $"{MitochondriaCorePlugin.Id}/{MitochondriaCorePlugin.Version}");
+            $"{MitochondriaUtilitiesPlugin.Id}/{MitochondriaUtilitiesPlugin.Version}");
 
         httpClient.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/vnd.github.raw+json"));

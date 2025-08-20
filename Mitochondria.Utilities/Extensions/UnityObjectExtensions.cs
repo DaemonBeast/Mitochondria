@@ -2,7 +2,7 @@ using System.Collections;
 using Reactor.Utilities;
 using Reactor.Utilities.Extensions;
 
-namespace Mitochondria.Core.Utilities.Extensions;
+namespace Mitochondria.Utilities.Extensions;
 
 public static class UnityObjectExtensions
 {

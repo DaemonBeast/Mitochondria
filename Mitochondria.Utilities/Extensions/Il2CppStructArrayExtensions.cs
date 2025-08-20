@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Mitochondria.Core.Utilities.Structures;
+using Mitochondria.Utilities.Structures;
 
-namespace Mitochondria.Core.Utilities.Extensions;
+namespace Mitochondria.Utilities.Extensions;
 
 public static class Il2CppStructArrayExtensions
 {

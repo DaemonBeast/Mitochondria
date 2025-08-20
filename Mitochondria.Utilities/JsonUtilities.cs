@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 
-namespace Mitochondria.Core.Utilities;
+namespace Mitochondria.Utilities;
 
-public static class JsonUtils
+public static class JsonUtilities
 {
     public static async ValueTask<T> DeserializeAsyncOrNew<T>(string filePath, Func<T> factory)
     {

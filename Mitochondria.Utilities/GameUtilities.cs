@@ -1,9 +1,9 @@
 using Reactor.Utilities.Attributes;
 using UnityEngine;
 
-namespace Mitochondria.Core.Utilities;
+namespace Mitochondria.Utilities;
 
-public static class GameUtils
+public static class GameUtilities
 {
     public static bool IsGameLoaded { get; private set; }
 

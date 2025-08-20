@@ -7,8 +7,4 @@
         <Description>Input module for Mitochondria</Description>
     </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Mitochondria.Core\Mitochondria.Core.csproj" />
-    </ItemGroup>
-
 </Project>

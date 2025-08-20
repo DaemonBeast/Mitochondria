@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Mitochondria.Core\Mitochondria.Core.csproj" />
+        <ProjectReference Include="..\Mitochondria.Utilities\Mitochondria.Utilities.csproj" />
     </ItemGroup>
 
 </Project>

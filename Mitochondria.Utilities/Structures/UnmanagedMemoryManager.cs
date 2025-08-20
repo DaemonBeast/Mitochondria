@@ -1,6 +1,6 @@
 using System.Buffers;
 
-namespace Mitochondria.Core.Utilities.Structures;
+namespace Mitochondria.Utilities.Structures;
 
 public unsafe class UnmanagedMemoryManager<T> : MemoryManager<T>
     where T : unmanaged

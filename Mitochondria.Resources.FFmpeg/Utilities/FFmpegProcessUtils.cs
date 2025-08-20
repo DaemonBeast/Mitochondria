@@ -1,6 +1,6 @@
 using System.Buffers;
 using System.Diagnostics;
-using Mitochondria.Core.Utilities.Extensions;
+using Mitochondria.Utilities.Extensions;
 
 namespace Mitochondria.Resources.FFmpeg.Utilities;
 

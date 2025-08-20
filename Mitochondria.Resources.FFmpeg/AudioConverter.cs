@@ -1,6 +1,6 @@
-﻿using Mitochondria.Core.Utilities;
-using Mitochondria.Core.Utilities.Extensions;
-using Mitochondria.Resources.FFmpeg.Utilities;
+﻿using Mitochondria.Resources.FFmpeg.Utilities;
+using Mitochondria.Utilities;
+using Mitochondria.Utilities.Extensions;
 
 namespace Mitochondria.Resources.FFmpeg;
 

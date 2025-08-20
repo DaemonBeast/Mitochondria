@@ -1,15 +1,14 @@
 ﻿using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
-using Mitochondria.Core.Utilities;
 using Reactor;
 
-namespace Mitochondria.Core;
+namespace Mitochondria.Utilities;
 
-[BepInAutoPlugin("astral.mitochondria")]
+[BepInAutoPlugin("astral.mitochondria.utilities")]
 [BepInProcess("Among Us.exe")]
 [BepInDependency(ReactorPlugin.Id)]
-public partial class MitochondriaCorePlugin : BasePlugin
+public partial class MitochondriaUtilitiesPlugin : BasePlugin
 {
     public Harmony Harmony { get; } = new(Id);
 
@@ -17,7 +16,7 @@ public partial class MitochondriaCorePlugin : BasePlugin
     {
         Harmony.PatchAll();
 
-        AddComponent<GameUtils.GameLoadWatcherBehaviour>();
+        AddComponent<GameUtilities.GameLoadWatcherBehaviour>();
     }
 
     public override bool Unload()

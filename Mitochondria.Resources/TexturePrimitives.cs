@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Mitochondria.Core.Utilities.Extensions;
+using Mitochondria.Utilities.Extensions;
 using UnityEngine;
 
 namespace Mitochondria.Resources;

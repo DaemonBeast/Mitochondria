@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Core", "Mitochondria.Core\Mitochondria.Core.csproj", "{A0F09C90-3677-4AA1-8B20-C19A425B8330}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Utilities", "Mitochondria.Utilities\Mitochondria.Utilities.csproj", "{A0F09C90-3677-4AA1-8B20-C19A425B8330}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Localization", "Mitochondria.Localization\Mitochondria.Localization.csproj", "{F9B025E7-C315-48FB-901D-F0F775ED11A3}"
 EndProject
