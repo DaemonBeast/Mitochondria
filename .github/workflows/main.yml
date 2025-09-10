@@ -19,6 +19,12 @@ jobs:
         with:
           dotnet-version: 6.x
 
+      - name: Clean solution
+        run: dotnet clean
+
+      - name: Restore solution
+        run: dotnet restore
+
       - name: Run the Cake script
         uses: cake-build/cake-action@v2
         with:
