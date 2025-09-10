@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Cosmetics", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Regions", "Mitochondria.Regions\Mitochondria.Regions.csproj", "{8421BA28-FF3A-4919-AF61-BC5761C0E031}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mitochondria.Networking", "Mitochondria.Networking\Mitochondria.Networking.csproj", "{630D394D-C94C-4855-889E-A6A185824A10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{8421BA28-FF3A-4919-AF61-BC5761C0E031}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8421BA28-FF3A-4919-AF61-BC5761C0E031}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8421BA28-FF3A-4919-AF61-BC5761C0E031}.Release|Any CPU.Build.0 = Release|Any CPU
+		{630D394D-C94C-4855-889E-A6A185824A10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{630D394D-C94C-4855-889E-A6A185824A10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{630D394D-C94C-4855-889E-A6A185824A10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{630D394D-C94C-4855-889E-A6A185824A10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

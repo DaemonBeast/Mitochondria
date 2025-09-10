@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="../Common.props" />
+    <Import Project="../AmongUs.props" />
+
+    <PropertyGroup>
+        <Description>Networking module for Mitochondria</Description>
+    </PropertyGroup>
+
+</Project>
