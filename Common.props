@@ -9,7 +9,8 @@
         <DebugType>embedded</DebugType>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-        <Version>0.15.0</Version>
+        <VersionPrefix>0.15.0</VersionPrefix>
+        <VersionSuffix>gamemodes.1</VersionSuffix>
         <Authors>Daemon</Authors>
 
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

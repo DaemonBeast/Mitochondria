@@ -39,6 +39,7 @@ Task("Build")
         var settings = new DotNetBuildSettings
         {
             Configuration = "Release",
+            NoIncremental = true,
             MSBuildSettings = new DotNetMSBuildSettings(),
             OutputDirectory = outputDir
         };
