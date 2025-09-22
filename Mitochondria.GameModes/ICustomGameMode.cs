@@ -2,7 +2,7 @@ namespace Mitochondria.GameModes;
 
 public interface ICustomGameMode
 {
-    public CustomGameModeConfiguration Configuration { get; internal set; }
+    public CustomGameModeConfiguration Configuration { get; protected internal set; }
 
     public StringNames Name { get; }
 
