@@ -10,7 +10,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
         <VersionPrefix>0.15.0</VersionPrefix>
-        <VersionSuffix>gamemodes.1</VersionSuffix>
+        <VersionSuffix>gamemodes.2</VersionSuffix>
         <Authors>Daemon</Authors>
 
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
