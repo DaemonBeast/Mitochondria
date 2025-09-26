@@ -13,10 +13,7 @@ internal static class HudManagerPatches
                 !GameManager.Instance.TryGetComponent<CustomGameModeBehaviour>(
                     out var customGameModeBehaviour)) return;
 
-            if (!customGameModeBehaviour.CustomGameMode.Configuration.Tasks.Enabled)
-            {
-                __instance.TaskPanel.gameObject.SetActive(false);
-            }
+            __instance.TaskStuff.SetActive(customGameModeBehaviour.CustomGameMode.Configuration.Tasks.Enabled);
         }
     }
 }

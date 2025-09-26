@@ -1,4 +1,5 @@
 using AmongUs.Data;
+using Il2CppInterop.Runtime.Attributes;
 using Reactor.Utilities.Attributes;
 using Reactor.Utilities.Extensions;
 using UnityEngine;
@@ -8,6 +9,7 @@ namespace Mitochondria.GameModes;
 [RegisterInIl2Cpp]
 public class CustomGameModeBehaviour : MonoBehaviour
 {
+    [HideFromIl2Cpp]
     public ICustomGameMode CustomGameMode { get; }
 
     private bool _initialized;

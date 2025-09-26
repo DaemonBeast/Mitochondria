@@ -2,9 +2,9 @@ using HarmonyLib;
 
 namespace Mitochondria.GameModes.Patches;
 
-internal static class LogicRoleSelectionPatches
+internal static class RoleManagerPatches
 {
-    [HarmonyPatch(typeof(LogicRoleSelection), nameof(LogicRoleSelection.AssignRolesForTeam))]
+    [HarmonyPatch(typeof(RoleManager), nameof(RoleManager.SetRole))]
     public static class DisableRoleSelectionPatch
     {
         public static bool Prefix()
