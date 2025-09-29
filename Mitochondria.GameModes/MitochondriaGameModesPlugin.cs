@@ -1,4 +1,4 @@
-﻿global using static Reactor.Utilities.Logger<Mitochondria.GameModes.MitochondriaGameModesPlugin>;
+global using static Reactor.Utilities.Logger<Mitochondria.GameModes.MitochondriaGameModesPlugin>;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
@@ -16,6 +16,11 @@ public partial class MitochondriaGameModesPlugin : BasePlugin
     public override void Load()
     {
         Harmony.PatchAll();
+
+        IL2CPPChainloader.Instance.PluginLoaded += plugin =>
+        {
+            CustomGameModeAttribute.Register(plugin.Instance.GetType().Assembly);
+        };
     }
 
     public override bool Unload()
@@ -25,3 +30,5 @@ public partial class MitochondriaGameModesPlugin : BasePlugin
         return base.Unload();
     }
 }
+
+// TODO: Start button hover effect missing

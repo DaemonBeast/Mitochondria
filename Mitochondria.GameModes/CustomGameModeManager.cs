@@ -1,4 +1,6 @@
-﻿namespace Mitochondria.GameModes;
+﻿using Mitochondria.GameModes.Utilities.Extensions;
+
+namespace Mitochondria.GameModes;
 
 /// <summary>
 /// Manages custom game modes.
@@ -8,9 +10,9 @@ public static class CustomGameModeManager
     /// <summary>
     /// Gets the registered game modes.
     /// </summary>
-    public static IReadOnlyDictionary<AmongUs.GameOptions.GameModes, ICustomGameMode> GameModes => InternalGameModes;
+    public static IReadOnlyDictionary<AmongUs.GameOptions.GameModes, BaseCustomGameMode> GameModes => InternalGameModes;
 
-    private static readonly Dictionary<AmongUs.GameOptions.GameModes, ICustomGameMode> InternalGameModes = new();
+    private static readonly Dictionary<AmongUs.GameOptions.GameModes, BaseCustomGameMode> InternalGameModes = new();
 
     private static byte _lastId = byte.MaxValue;
 
@@ -25,8 +27,10 @@ public static class CustomGameModeManager
     /// Register a game mode.
     /// </summary>
     /// <typeparam name="TCustomGameMode">The game mode to register.</typeparam>
-    public static void Register<TCustomGameMode>()
-        where TCustomGameMode : ICustomGameMode, new()
+    /// <typeparam name="TCustomGameModeFlow">The game mode flow.</typeparam>
+    public static void Register<TCustomGameMode, TCustomGameModeFlow>()
+        where TCustomGameMode : BaseCustomGameMode<TCustomGameModeFlow>, new()
+        where TCustomGameModeFlow : BaseCustomGameModeFlow, new()
     {
         if (GameModes.Values.FirstOrDefault(customGameMode => customGameMode is TCustomGameMode)
             is { } matchingCustomGameMode)
@@ -37,59 +41,45 @@ public static class CustomGameModeManager
             return;
         }
 
-        var gameMode = NextId();
         var newCustomGameMode = new TCustomGameMode();
-        InternalGameModes.Add(gameMode, newCustomGameMode);
-
-        var builder = new CustomGameModeConfigurationBuilder(newCustomGameMode.Configuration);
-        newCustomGameMode.OnConfigure(builder);
-        newCustomGameMode.Configuration = builder.Build();
-
-        Debug($"Registered game mode \"{TranslationController.Instance.GetString(newCustomGameMode.Name)}\".");
+        ConfigureNewGameMode(newCustomGameMode);
     }
 
-    /// <summary>
-    /// Register a game mode.
-    /// </summary>
-    /// <param name="customGameModeType">The game mode to register. Must inherit from <see cref="ICustomGameMode"/>.</param>
     internal static void Register(Type customGameModeType)
     {
-        if (!typeof(ICustomGameMode).IsAssignableFrom(customGameModeType))
+        if (GameModes.Values.FirstOrDefault(customGameMode => customGameMode.GetType() == customGameModeType) is
+            { } existingCustomGameMode)
         {
-            Warning($"{customGameModeType.Name} does not inherit {nameof(ICustomGameMode)}.");
+            Warning(
+                $"Tried to register the game mode \"{TranslationController.Instance.GetString(existingCustomGameMode.Name)}\" but it was already registered.");
+
             return;
         }
 
-        if (GameModes.Values.Any(customGameMode => customGameMode.GetType() == customGameModeType))
-        {
-            Warning($"Tried to register the game mode \"{customGameModeType.Name}\" but it was already registered.");
-            return;
-        }
+        var newCustomGameMode = (BaseCustomGameMode) Activator.CreateInstance(customGameModeType)!;
+        ConfigureNewGameMode(newCustomGameMode);
+    }
 
-        ICustomGameMode newCustomGameMode;
-        try
-        {
-            var nullableCustomGameMode = Activator.CreateInstance(customGameModeType);
-            if (nullableCustomGameMode is not ICustomGameMode customGameMode)
-            {
-                Error($"Failed to instantiate the game mode \"{customGameModeType.Name}\".");
-                return;
-            }
-
-            newCustomGameMode = customGameMode;
-        }
-        catch (Exception e)
-        {
-            Error($"Failed to instantiate the game mode \"{customGameModeType.Name}\": {e}");
-            return;
-        }
-
+    private static void ConfigureNewGameMode(BaseCustomGameMode newCustomGameMode)
+    {
         var gameMode = NextId();
         InternalGameModes.Add(gameMode, newCustomGameMode);
 
         var builder = new CustomGameModeConfigurationBuilder(newCustomGameMode.Configuration);
+
+        var baseTypes = newCustomGameMode.GetType()
+            .GetBaseTypes()
+            .TakeWhile(potentialType => potentialType is { IsGenericType: false, IsAbstract: false })
+            .Reverse();
+
+        foreach (var baseType in baseTypes)
+        {
+            var tempCustomGameMode = (BaseCustomGameMode) Activator.CreateInstance(baseType)!;
+            tempCustomGameMode.OnConfigure(builder);
+        }
+
         newCustomGameMode.OnConfigure(builder);
-        newCustomGameMode.Configuration = builder.Build();
+        newCustomGameMode.InternalConfiguration = builder.Build();
 
         Debug($"Registered game mode \"{TranslationController.Instance.GetString(newCustomGameMode.Name)}\".");
     }

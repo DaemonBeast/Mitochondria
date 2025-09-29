@@ -1,5 +1,7 @@
 using AmongUs.Data;
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
+using Mitochondria.GameModes.Utilities.Extensions;
 
 namespace Mitochondria.GameModes.Patches;
 
@@ -22,9 +24,9 @@ internal static class GameManagerPatches
     {
         public static void Postfix(GameManager __instance)
         {
-            if (!__instance.TryGetComponent<CustomGameModeBehaviour>(out var customGameModeBehaviour)) return;
+            if (!__instance.TryGetActiveCustomGameModeFlow(out var customGameModeFlow)) return;
 
-            customGameModeBehaviour.CustomGameMode.Flow.AfterGameStart();
+            __instance.StartCoroutine(customGameModeFlow.CoAfterGameStart().WrapToIl2Cpp());
         }
     }
 
@@ -33,9 +35,9 @@ internal static class GameManagerPatches
     {
         public static void Postfix(GameManager __instance)
         {
-            if (!__instance.TryGetComponent<CustomGameModeBehaviour>(out var customGameModeBehaviour)) return;
+            if (!__instance.TryGetActiveCustomGameModeFlow(out var customGameModeFlow)) return;
 
-            customGameModeBehaviour.CustomGameMode.Flow.AfterGameEnd();
+            customGameModeFlow.AfterGameEnd();
         }
     }
 }

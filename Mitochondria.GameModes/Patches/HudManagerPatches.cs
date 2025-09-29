@@ -1,4 +1,5 @@
 using HarmonyLib;
+using Mitochondria.GameModes.Utilities;
 
 namespace Mitochondria.GameModes.Patches;
 
@@ -9,11 +10,9 @@ internal static class HudManagerPatches
     {
         public static void Postfix(HudManager __instance)
         {
-            if (GameManager.Instance == null ||
-                !GameManager.Instance.TryGetComponent<CustomGameModeBehaviour>(
-                    out var customGameModeBehaviour)) return;
+            if (!CustomGameModeUtilities.TryGetActiveGameMode(out var customGameMode)) return;
 
-            __instance.TaskStuff.SetActive(customGameModeBehaviour.CustomGameMode.Configuration.Tasks.Enabled);
+            __instance.TaskStuff.SetActive(customGameMode.Configuration.Tasks.Enabled);
         }
     }
 }

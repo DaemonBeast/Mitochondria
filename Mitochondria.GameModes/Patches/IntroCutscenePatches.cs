@@ -1,6 +1,7 @@
 using System.Collections;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
+using Mitochondria.GameModes.Utilities;
 using Reactor.Utilities.Extensions;
 
 namespace Mitochondria.GameModes.Patches;
@@ -17,22 +18,36 @@ internal static class IntroCutscenePatches
             Il2CppSystem.Collections.IEnumerator originalEnumerator,
             IntroCutscene introCutscene)
         {
-            if (GameManager.Instance.TryGetComponent<CustomGameModeBehaviour>(out var customGameModeBehaviour) &&
-                !customGameModeBehaviour.CustomGameMode.Configuration.IntroCutscene.ShowTeamAndRole)
+            if (!CustomGameModeUtilities.TryGetActiveGameMode(out var customGameMode) || customGameMode.Flow == null)
+            {
+                yield return originalEnumerator.WrapToManaged();
+                yield break;
+            }
+
+            var coIntroCutscene = EnumeratorUtilities.ConcatAll(
+                customGameMode.Configuration.IntroCutscene.IntroCutsceneTypes
+                    .Select(type =>
+                        ((BaseCustomGameModeIntroCutscene) Activator.CreateInstance(type)!).CoIntroCutscene())
+                    .ToArray());
+
+            var coBeforeCutsceneEnds = EnumeratorUtilities.WhenAll(
+                GameManager.Instance.StartCoroutine,
+                coIntroCutscene,
+                customGameMode.Flow.CoSetupGame());
+
+            if (customGameMode.Configuration.IntroCutscene.ShowTeamAndRole)
+            {
+                yield return originalEnumerator.WrapToManaged();
+            }
+            else
             {
                 yield return ShipStatus.Instance.CosmeticsCache.PopulateFromPlayers();
 
                 ShipStatus.Instance.StartSFX();
                 introCutscene.gameObject.Destroy();
-
-                yield return customGameModeBehaviour.CustomGameMode.Flow.CoBeforeGameStart();
-
-                yield break;
             }
 
-            while (originalEnumerator.MoveNext()) yield return originalEnumerator.Current;
-
-            yield return customGameModeBehaviour.CustomGameMode.Flow.CoBeforeGameStart();
+            yield return coBeforeCutsceneEnds;
         }
     }
 }

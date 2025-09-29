@@ -1,4 +1,5 @@
 using HarmonyLib;
+using Mitochondria.GameModes.Utilities.Extensions;
 
 namespace Mitochondria.GameModes.Patches;
 
@@ -9,14 +10,13 @@ internal static class LogicGameFlowNormalPatches
     {
         public static bool Prefix(LogicGameFlowNormal __instance)
         {
-            if (!__instance.Manager.TryGetComponent<CustomGameModeBehaviour>(
-                    out var customGameModeBehaviour)) return true;
+            if (!__instance.Manager.TryGetActiveCustomGameModeFlow(out var customGameModeFlow)) return true;
 
-            if (customGameModeBehaviour.CustomGameMode.Flow.ShouldEndGame(out var gameOverReason))
+            if (customGameModeFlow.ShouldEndGame() is { ShouldEndGame: true, Reason: var reason })
             {
-                customGameModeBehaviour.CustomGameMode.Flow.BeforeGameEnd();
+                customGameModeFlow.BeforeGameEnd();
 
-                __instance.Manager.RpcEndGame(gameOverReason.Value, false);
+                __instance.Manager.RpcEndGame(reason ?? GameOverReason.ImpostorsByKill, false);
             }
 
             return false;

@@ -10,7 +10,7 @@ namespace Mitochondria.GameModes;
 public class CustomGameModeBehaviour : MonoBehaviour
 {
     [HideFromIl2Cpp]
-    public ICustomGameMode CustomGameMode { get; }
+    public BaseCustomGameMode CustomGameMode { get; }
 
     private bool _initialized;
 
@@ -32,7 +32,7 @@ public class CustomGameModeBehaviour : MonoBehaviour
             return;
         }
 
-        CustomGameMode.Initialize();
+        CustomGameMode.Flow = CustomGameMode.CreateFlow();
         _initialized = true;
     }
 
@@ -40,6 +40,6 @@ public class CustomGameModeBehaviour : MonoBehaviour
     {
         if (!_initialized) return;
 
-        CustomGameMode.Deinitialize();
+        CustomGameMode.Flow?.Dispose();
     }
 }

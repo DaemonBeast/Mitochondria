@@ -87,7 +87,7 @@ public class CustomGameModeConfigurationBuilder
             return _builder;
         }
 
-        public CustomGameModeConfigurationBuilder ShowRole()
+        public CustomGameModeConfigurationBuilder ShowTeamAndRole()
         {
             _builder._introCutscene = _builder._introCutscene with { ShowTeamAndRole = true };
             return _builder;
@@ -96,6 +96,18 @@ public class CustomGameModeConfigurationBuilder
         public CustomGameModeConfigurationBuilder HideTeamAndRole()
         {
             _builder._introCutscene = _builder._introCutscene with { ShowTeamAndRole = false };
+            return _builder;
+        }
+
+        public CustomGameModeConfigurationBuilder Append<TCustomGameModeIntroCutscene>()
+            where TCustomGameModeIntroCutscene : BaseCustomGameModeIntroCutscene
+        {
+            _builder._introCutscene = _builder._introCutscene with
+            {
+                IntroCutsceneTypes = _builder._introCutscene.IntroCutsceneTypes
+                    .Append(typeof(TCustomGameModeIntroCutscene)).ToArray()
+            };
+
             return _builder;
         }
     }
@@ -124,7 +136,7 @@ public class CustomGameModeConfigurationBuilder
         }
     }
 
-    public CustomGameModeConfiguration Build()
+    internal CustomGameModeConfiguration Build()
         => new(_players, _roles, _introCutscene, _tasks);
 }
 
@@ -137,7 +149,7 @@ public record CustomGameModeConfiguration(
     public static CustomGameModeConfiguration Default { get; } = new(
         new PlayersConfiguration(4, 15),
         new RoleSelectionConfiguration(true),
-        new IntroCutsceneConfiguration(true, true),
+        new IntroCutsceneConfiguration(true, true, Array.Empty<Type>()),
         new TasksConfiguration(true));
 
     public record PlayersConfiguration(
@@ -149,7 +161,8 @@ public record CustomGameModeConfiguration(
 
     public record IntroCutsceneConfiguration(
         bool ShowEmblem,
-        bool ShowTeamAndRole);
+        bool ShowTeamAndRole,
+        Type[] IntroCutsceneTypes);
 
     public record TasksConfiguration(
         bool Enabled);
